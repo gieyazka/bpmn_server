@@ -62,27 +62,24 @@ class API extends common_1.Common {
                 console.log(176, context.item._status, "||", context.item.element.name, context.item.element.id);
                 if ((_a = context.item.element.name) === null || _a === void 0 ? void 0 : _a.includes("check_rule")) {
                     const [name, condition, level] = context.item.element.name.split(":");
-                    const { empid, company, department, section } = context.item.token.execution.input;
+                    const { empid, company, department, section } = context.execution.instance.data;
                     if (context.item._status === 'start') {
                         const res = yield index_1.default.checkBoolLevel({ empid, condition, level, });
                         context.item.token.execution.output = { checkStatus: res.data.status };
-                        let newInput = Object.assign({}, context.item.token.execution.input);
-                        // context.item.token.execution.input = { ...newInput, testData: "1234" }
-                        console.log(85, context.execution.instance.data);
-                        context.execution.instance.data.test = "rtaweaksdsajkdhj";
+                        context.execution.instance.data.test = "testInsertData";
                     }
                 }
                 if ((_b = context.item.element.name) === null || _b === void 0 ? void 0 : _b.includes("get_position")) {
                     if (context.item._status === 'start') {
                         const [name, level] = context.item.element.name.split(":");
-                        const { company, department, section } = context.item.token.execution.input;
+                        const { company, department, section } = context.execution.instance.data;
                         const res = yield index_1.default.getEmpPosition({ company, department, section, level });
                         context.item.token.execution.output = { checkStatus: res.data.status, positionData: (_c = res.data.data) === null || _c === void 0 ? void 0 : _c.employee };
                     }
                 }
                 console.log("name : ", context.item.element.name);
-                console.log("Input : ", context.item.token.execution.input);
-                console.log("DATA :", context.execution.data);
+                console.log("Input : ", context.execution.execution.input);
+                console.log("DATA :", context.execution.instance.data);
                 console.log("Output : ", context.item.token.execution.output);
             }
         }));
@@ -194,7 +191,7 @@ class API extends common_1.Common {
             console.log(workId, data);
             try {
                 userKey = this.bpmnServer.iam.getRemoteUser(userId);
-                context = yield bpmnServer.engine.invoke({ id: workId, "items.elementId": 'department_manager' }, { testInvoke: true }, userKey, options);
+                context = yield bpmnServer.engine.invoke({ id: workId, "items.name": 'send_email:M4' }, { testInvoke: true }, userKey, options);
                 instance = context.instance;
                 if (context && context.errors)
                     errors = context.errors.toString();

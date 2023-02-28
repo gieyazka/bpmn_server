@@ -74,18 +74,14 @@ export class API extends Common {
                     const [name, condition, level] = context.item.element.name.split(":")
                     const {
                         empid, company, department, section
-                    } = context.item.token.execution.input
+                    } = context.execution.instance.data
                     if (context.item._status === 'start') {
 
                         const res = await CustomNode.checkBoolLevel({ empid, condition, level, })
                         context.item.token.execution.output = { checkStatus: res.data.status }
-                        let newInput = { ...context.item.token.execution.input }
-                        // context.item.token.execution.input = { ...newInput, testData: "1234" }
-                        console.log(
-85,
-                            context.execution.instance.data
-                            );
-                            context.execution.instance.data.test = "rtaweaksdsajkdhj"
+             
+
+                        context.execution.instance.data.test = "testInsertData"
 
                     }
                 }
@@ -95,14 +91,14 @@ export class API extends Common {
                         const [name, level] = context.item.element.name.split(":")
                         const {
                             company, department, section
-                        } = context.item.token.execution.input
+                        } = context.execution.instance.data
                         const res = await CustomNode.getEmpPosition({ company, department, section, level })
                         context.item.token.execution.output = { checkStatus: res.data.status, positionData: res.data.data?.employee }
                     }
                 }
                 console.log("name : ", context.item.element.name);
-                console.log("Input : ", context.item.token.execution.input);
-                console.log("DATA :", context.execution.data);
+                console.log("Input : ", context.execution.execution.input);
+                console.log("DATA :", context.execution.instance.data);
                 console.log("Output : ", context.item.token.execution.output);
             }
         });
@@ -240,7 +236,7 @@ export class API extends Common {
             try {
                 userKey = this.bpmnServer.iam.getRemoteUser(userId);
 
-                context = await bpmnServer.engine.invoke({ id: workId, "items.elementId": 'department_manager' }, { testInvoke: true }, userKey, options);
+                context = await bpmnServer.engine.invoke({ id: workId, "items.name": 'send_email:M4' }, { testInvoke: true }, userKey, options);
                 instance = context.instance;
 
                 if (context && context.errors)
