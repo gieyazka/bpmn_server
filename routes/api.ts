@@ -1,23 +1,23 @@
 import express = require('express');
 const router = express.Router();
-var bodyParser = require('body-parser')
 //import { ExecuteDecisionTable, ExecuteCondition, ExecuteExpression } from 'dmn-engine';
-
+var mongoose = require('mongoose');
 import FS = require('fs');
 
 import { BPMNServer, Behaviour_names, CacheManager, Logger, dateDiff } from '..';
 import { configuration as config, configuration } from '../configuration';
 
 import { Common } from './common';
+import CustomApi from '../custom_api/index'
 import CustomNode from '../custom_node/index'
+import { nanoid } from 'nanoid'
 
-import EventEmitter = require('events');
+const dayjs = require('dayjs')
 const AwaitEventEmitter = require('await-event-emitter').default
 //const bpmnServer = new BPMNServer(config);
 
 //const definitions = bpmnServer.definitions;
 
-var caseId = Math.floor(Math.random() * 10000);
 
 /* GET users listing. */
 
@@ -69,46 +69,152 @@ export class API extends Common {
             // console.log(174, context.item?.element.name);
 
             if (context.item) {
-                console.log(176, context.item._status, "||", context.item.element.name, context.item.element.id);
-                if (context.item.element.name?.includes("check_rule")) {
-                    const [name, condition, level] = context.item.element.name.split(":")
-                    const {
-                        empid, company, department, section
-                    } = context.execution.instance.data
+                console.log(176, context.item._status, "||", context.item.element.name, context.item.element?.name === "End", context.item.element.id);
+                if (context.item.element.name?.includes("start_flow")) {
+
                     if (context.item._status === 'start') {
+                        context.execution.instance.task_id = `EF-${dayjs().format('YYYYMMDD')}-${nanoid(6)}`
+
+                    }
+                }
+                if (context.item.element.name?.includes("check_rule")) {
+
+                    if (context.item._status === 'start') {
+                        const [name, condition, level] = context.item.element.name.split(":")
+
+                        //TODO: add company for check if need
+                        const {
+                            empid, company, department, section
+                        } = context.execution.instance.data.requester
 
                         const res = await CustomNode.checkBoolLevel({ empid, condition, level, })
                         context.item.token.execution.output = { checkStatus: res.data.status }
-             
 
-                        context.execution.instance.data.test = "testInsertData"
+                        // console.log(context.item);
+
 
                     }
                 }
                 if (context.item.element.name?.includes("get_position")) {
 
                     if (context.item._status === 'start') {
-                        const [name, level] = context.item.element.name.split(":")
-                        const {
+                        const splitArr = context.item.element.name.split(":")
+                        const [name, level] = splitArr
+                        let {
                             company, department, section
-                        } = context.execution.instance.data
+                        } = context.execution.instance.data.requester
+                        if (splitArr.length > 2) {
+                            [company, department, section] = splitArr.slice(2)
+                        }
+
                         const res = await CustomNode.getEmpPosition({ company, department, section, level })
                         context.item.token.execution.output = { checkStatus: res.data.status, positionData: res.data.data?.employee }
                     }
                 }
-                console.log("name : ", context.item.element.name);
-                console.log("Input : ", context.execution.execution.input);
-                console.log("DATA :", context.execution.instance.data);
-                console.log("Output : ", context.item.token.execution.output);
+                if (context.item.element.name?.includes("send_email_approve")) {
+
+                    if (context.item._status === 'start') {
+
+                        const splitArr = context.item.element.name.split(":")
+                        const [name, level] = splitArr
+
+
+
+                        let {
+                            empid, company, department, section
+                        } = context.execution.instance.data.requester
+                        let res
+                        if (level === 'head') {
+                            ///get Head
+                            res = await CustomNode.getHead({ empid })
+                        } else {
+                            if (splitArr.length > 2) {
+                                [company, department, section] = splitArr.slice(2)
+                            }
+                            res = await CustomNode.getEmpPosition({ company, department, section, level })
+                        }
+                        console.log(116, res.data);
+                        let approverData: any = { company, department, section, level }
+
+                        if (res.data.status) {
+                            // send Email
+                            let emailData = {
+                                "empid": "AH10002500",
+                                "reason": "sick kub",
+                                "flowName": "leave_flow",
+                                "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
+                                "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
+                                "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
+                            }
+                            let approverSection = res.data.data.section
+                            let approverEmployee = res.data.data.employee
+                            let approverLevel = res.data.data.level
+                            approverData = {
+                                name: approverEmployee.prefix + "." + approverEmployee.firstName + " " + approverEmployee.lastName,
+                                email: approverEmployee.email,
+                                empid: approverEmployee.empid,
+                                position: approverLevel.position,
+                                priority: approverLevel.priority,
+                                level: approverLevel.level,
+                                section: approverSection.name,
+                                company, department,
+
+                            }
+                            const resEmail = await CustomApi.sendStrapi_email(emailData)
+
+                        }
+
+                        context.execution.instance.data.currentApprover = approverData
+                        context.execution.instance.data.status = "Waiting"
+                    }
+
+
+                    if (context.item._status === 'end') {
+                        //onEmail Action
+                        context.item.token.execution.output = { checkStatus: context.execution.instance.data.approved }
+                        let appList = context.execution.instance.data.approverList
+                            || []
+                        let newApprover = {
+                            ...context.execution.instance.data.currentApprover,
+                            date: dayjs().toISOString(),
+                            action: context.execution.instance.data.approved ? "Approved" : "Rejected"
+                        }
+                        console.log(context.execution.execution.input);
+
+                        appList.push(newApprover)
+                        context.execution.instance.data.approverList
+                            = appList
+                        context.execution.instance.data.currentApprover = null
+                        context.execution.instance.data.status = context.execution.instance.data.approved ? "Waiting" : "Rejected"
+                        // console.log(context.item);
+
+
+                    }
+                }
+
+                if (context.item.element?.name?.includes("end_flow")) {
+                    console.log(162, context.execution.instance.data.status);
+
+                    if (context.item._status === 'end') {
+
+                        if (context.execution.instance.data.status !== "Rejected") {
+                            context.execution.instance.data.status = "Success"
+                        }
+
+
+                    }
+                }
+                // console.log("name : ", context.item.element.name);
+                // console.log("Input : ", context.execution.execution.input);
+                // console.log("DATA :", context.execution.instance.data);
+                // console.log("Output : ", context.item.token.execution.output);
             }
+
+            context.execution.instance.data.lastUpdate = dayjs().toISOString()
+
         });
 
         bpmnServer.listener = listener
-
-
-
-
-
         router.get('/datastore/findItems', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             console.log(request.body);
@@ -174,7 +280,7 @@ export class API extends Common {
         }));
 
         router.post('/engine/start/:name?', loggedIn, awaitAppDelegateFactory(async (request, response) => {
-
+            // console.log(200, mongoose.connection.readyState);
             try {
                 let name = request.params.name;
                 if (!name)
@@ -202,6 +308,8 @@ export class API extends Common {
                 context = await bpmnServer.engine.start(name, data, null,);
 
                 // console.log(context);
+                // console.log(204,await CustomApi.getCurrentApprove());
+
                 response.json(context.instance);
             }
             catch (exc) {
@@ -227,12 +335,10 @@ export class API extends Common {
                 userId = request.body.userId;
             }
             let workId = request.body.id
-            console.log(query);
             let context;
             let instance;
             let errors;
             console.log(workId, data);
-
             try {
                 userKey = this.bpmnServer.iam.getRemoteUser(userId);
 
@@ -250,6 +356,49 @@ export class API extends Common {
 
 
         }));
+
+
+        router.get('/engine/invoke/:id/:field/:value', awaitAppDelegateFactory(async (request, response) => {
+
+            let params = request.params;
+            console.log("params----", params);
+            let query, data;
+            query =
+            {
+                "items.id": params.id
+            }
+            let value = params.value
+            if (params.field === "approved") {
+                if (params.value === "true") {
+                    value = true
+                } else {
+                    value = false
+                }
+            }
+            data = {
+                [params.field]: value
+            }
+
+            console.log("query----", query, data);
+            let context;
+            let instance;
+            let errors;
+            try {
+                // let Datacontext = await this.bpmnServer.engine.get(query);
+                // console.log(Datacontext);
+
+                context = await bpmnServer.engine.invoke(query, data);
+                instance = context.instance;
+                if (context && context.errors)
+                    errors = context.errors.toString();
+            }
+            catch (exc) {
+                errors = exc.toString();
+                console.log(errors);
+            }
+            response.json({ errors: errors, instance });
+        }));
+
 
         router.get('/engine/get', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 

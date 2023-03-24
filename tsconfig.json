@@ -9,7 +9,7 @@
   },
   "include": [
     "**/*.ts"
-  ],
+, "custom_api/strapi_api.ts"  ],
   "exclude": [
      "node_modules" , "./dist" , "./tools"
   ]

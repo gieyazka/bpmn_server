@@ -21,14 +21,12 @@ const mongoose = require('mongoose');
 //NOPASSPORT const passport = require('passport');
 //const sass = require('node-sass-middleware');
 const multer = require('multer');
-
+const cors = require('cors');
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
 import { BPMNServer, Logger } from './';
 
-
 import { configuration as config } from './configuration';
-
 
 var busboy = require('connect-busboy'); //middleware for form/file upload
 
@@ -80,6 +78,7 @@ export class WebApp {
 		/**
 		 * Express configuration.
 		 */
+		app.use(cors())
 		app.set('host', process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
 		app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3000);
 		app.set('views', path.join(__dirname, 'views'));
@@ -215,12 +214,14 @@ export class WebApp {
 		var Docs = require("./routes/docs").Docs;
 		var Model = require("./routes/model").Model;
 		var API = require("./routes/api").API;
+		var Custom_API = require("./routes/custom_api").API;
 
 		this.app.use('/', (new Workflow(this)).config());
 		//NOPASSPORT 		this.app.use('/', (new Account(this)).config());
 		this.app.use('/docs', (new Docs(this)).config());
 		this.app.use('/model', (new Model(this)).config());
 		this.app.use('/api', (new API(this)).config());
+		this.app.use('/custom_api', (new Custom_API(this)).config());
 
 	}
 

@@ -121,8 +121,8 @@ export class Workflow extends Common {
 
 
             let execution = context.execution;
-            console.log(context);
-            console.log(141253)
+            
+            
             response.redirect('/instanceDetails?id=' + execution.id);
         }));
 
@@ -408,7 +408,8 @@ async function instanceDetails(response,instanceId) {
     });
 
     let decorations = JSON.stringify(calculateDecorations(instance.items));
-
+    // console.log(decorations);
+    
     response.render('InstanceDetails',
         {
             instance, vars,

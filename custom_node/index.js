@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { checkBoolLevel, getEmpPosition } = require('./check_level');
+const { checkBoolLevel, getEmpPosition, getHead } = require('./check_level');
 exports.default = {
-    checkBoolLevel, getEmpPosition
+    checkBoolLevel, getEmpPosition, getHead
 };
 //# sourceMappingURL=index.js.map

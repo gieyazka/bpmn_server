@@ -97,8 +97,6 @@ class Workflow extends common_1.Common {
                 displayError(response, context.errors);
             }
             let execution = context.execution;
-            console.log(context);
-            console.log(141253);
             response.redirect('/instanceDetails?id=' + execution.id);
         })));
         router.post('/execute', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
@@ -330,6 +328,7 @@ function instanceDetails(response, instanceId) {
             vars.push({ key, value });
         });
         let decorations = JSON.stringify(calculateDecorations(instance.items));
+        // console.log(decorations);
         response.render('InstanceDetails', {
             instance, vars,
             accessRules: def.accessRules,

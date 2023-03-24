@@ -1,22 +1,18 @@
-const axios = require('axios')
+var axios = require('axios')
 
 const checkBoolLevel = async ({ condition, empid, level, }: {
     condition: string, empid: string, level: string, company: string, department: string, section: string
 }) => {
-    const checMyLevel = await axios.post(`${process.env.Strapi_URL}/api/hierachies/checkMyLevel`, {
+
+    const checMyLevel = await axios.post(`${process.env.Strapi_URL}/api/hierachies/checkConditionLevel`, {
         condition, empid, level
     })
     return checMyLevel
-
-
-
 }
-
 const getEmpPosition = async ({ company, department, section, level }: {
     level: string, company: string, department: string, section: string
 }) => {
- 
-
+  
     const getEmpByLevel = await axios.post(`${process.env.Strapi_URL}/api/orgs/searchOrg`, {
         company,
         department,
@@ -27,5 +23,18 @@ const getEmpPosition = async ({ company, department, section, level }: {
 
     return getEmpByLevel
 }
+const getHead = async ({ empid }: {
+    empid: string
+}) => {
+    const getEmpByLevel = await axios.post(`${process.env.Strapi_URL}/api/orgs/getHead`, {
+        empid
+    }).catch(err => console.log(err)
+    )
 
-export { checkBoolLevel, getEmpPosition }
+    return getEmpByLevel
+}
+
+
+
+
+module.exports = { checkBoolLevel, getEmpPosition, getHead, }
