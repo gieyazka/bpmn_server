@@ -231,7 +231,8 @@ export class API extends Common {
 
                 // console.log(context);
                 const mongoData = await CustomApi.getmyTask(data);
-
+                console.log(234,mongoData);
+                
                 response.json(mongoData);
             }
             catch (exc) {
@@ -277,45 +278,10 @@ export class API extends Common {
             }
         }));
 
+
         return router;
     }
 }
-async function display(res, title, output, logs = [], items = []) {
 
-    console.log(" Display Started");
-    var instances = await this.bpmnServer.dataStore.findInstances({}, 'full');
-    let waiting = await this.bpmnServer.dataStore.findItems({ items: { status: 'wait' } });
-
-    waiting.forEach(item => {
-        item.fromNow = dateDiff(item.startedAt);
-    });
-
-    let engines = this.bpmnServer.cache.list();
-
-    engines.forEach(engine => {
-        engine.fromNow = dateDiff(engine.startedAt);
-        engine.fromLast = dateDiff(engine.lastAt);
-    });
-
-    instances.forEach(item => {
-        item.fromNow = dateDiff(item.startedAt);
-        if (item.endedAt)
-            item.endFromNow = dateDiff(item.endedAt);
-        else
-            item.endFromNow = '';
-    });
-
-    res.render('index',
-        {
-            title: title, output: output,
-            engines,
-            procs: this.bpmnServer.definitions.getList(),
-            debugMsgs: [], // Logger.get(),
-            waiting: waiting,
-            instances,
-            logs, items
-        });
-
-}
 
 export default router;

@@ -190,6 +190,7 @@ class API extends common_1.Common {
                 userKey = this.bpmnServer.iam.getRemoteUser(userId);
                 // console.log(context);
                 const mongoData = yield index_1.default.getmyTask(data);
+                console.log(234, mongoData);
                 response.json(mongoData);
             }
             catch (exc) {
@@ -230,36 +231,5 @@ class API extends common_1.Common {
     }
 }
 exports.API = API;
-function display(res, title, output, logs = [], items = []) {
-    return __awaiter(this, void 0, void 0, function* () {
-        console.log(" Display Started");
-        var instances = yield this.bpmnServer.dataStore.findInstances({}, 'full');
-        let waiting = yield this.bpmnServer.dataStore.findItems({ items: { status: 'wait' } });
-        waiting.forEach(item => {
-            item.fromNow = (0, __1.dateDiff)(item.startedAt);
-        });
-        let engines = this.bpmnServer.cache.list();
-        engines.forEach(engine => {
-            engine.fromNow = (0, __1.dateDiff)(engine.startedAt);
-            engine.fromLast = (0, __1.dateDiff)(engine.lastAt);
-        });
-        instances.forEach(item => {
-            item.fromNow = (0, __1.dateDiff)(item.startedAt);
-            if (item.endedAt)
-                item.endFromNow = (0, __1.dateDiff)(item.endedAt);
-            else
-                item.endFromNow = '';
-        });
-        res.render('index', {
-            title: title, output: output,
-            engines,
-            procs: this.bpmnServer.definitions.getList(),
-            debugMsgs: [],
-            waiting: waiting,
-            instances,
-            logs, items
-        });
-    });
-}
 exports.default = router;
 //# sourceMappingURL=custom_api.js.map

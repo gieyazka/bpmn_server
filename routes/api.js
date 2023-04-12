@@ -10,8 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.API = void 0;
+const axios = require('axios');
 const express = require("express");
 const router = express.Router();
+const multer = require('multer');
+const upload = multer();
+var FormData = require('form-data');
 //import { ExecuteDecisionTable, ExecuteCondition, ExecuteExpression } from 'dmn-engine';
 var mongoose = require('mongoose');
 const __1 = require("..");
@@ -60,15 +64,15 @@ class API extends common_1.Common {
         const listener = new AwaitEventEmitter();
         listener.on('all', ({ context, event }) => __awaiter(this, void 0, void 0, function* () {
             // console.log(174, context.item?.element.name);
-            var _a, _b, _c, _d, _e, _f, _g, _h;
+            var _a, _b, _c, _d, _e, _f, _g;
             if (context.item) {
-                console.log(176, context.item._status, "||", context.item.element.name, ((_a = context.item.element) === null || _a === void 0 ? void 0 : _a.name) === "End", context.item.element.id);
-                if ((_b = context.item.element.name) === null || _b === void 0 ? void 0 : _b.includes("start_flow")) {
+                // console.log(176, context.item._status, "||", context.item.element.name, context.item.element?.name === "End", context.item.element.id);
+                if ((_a = context.item.element.name) === null || _a === void 0 ? void 0 : _a.includes("start_flow")) {
                     if (context.item._status === 'start') {
                         context.execution.instance.task_id = `EF-${dayjs().format('YYYYMMDD')}-${(0, nanoid_1.nanoid)(6)}`;
                     }
                 }
-                if ((_c = context.item.element.name) === null || _c === void 0 ? void 0 : _c.includes("check_rule")) {
+                if ((_b = context.item.element.name) === null || _b === void 0 ? void 0 : _b.includes("check_rule")) {
                     if (context.item._status === 'start') {
                         const [name, condition, level] = context.item.element.name.split(":");
                         //TODO: add company for check if need
@@ -78,7 +82,7 @@ class API extends common_1.Common {
                         // console.log(context.item);
                     }
                 }
-                if ((_d = context.item.element.name) === null || _d === void 0 ? void 0 : _d.includes("get_position")) {
+                if ((_c = context.item.element.name) === null || _c === void 0 ? void 0 : _c.includes("get_position")) {
                     if (context.item._status === 'start') {
                         const splitArr = context.item.element.name.split(":");
                         const [name, level] = splitArr;
@@ -87,10 +91,10 @@ class API extends common_1.Common {
                             [company, department, section] = splitArr.slice(2);
                         }
                         const res = yield index_2.default.getEmpPosition({ company, department, section, level });
-                        context.item.token.execution.output = { checkStatus: res.data.status, positionData: (_e = res.data.data) === null || _e === void 0 ? void 0 : _e.employee };
+                        context.item.token.execution.output = { checkStatus: res.data.status, positionData: (_d = res.data.data) === null || _d === void 0 ? void 0 : _d.employee };
                     }
                 }
-                if ((_f = context.item.element.name) === null || _f === void 0 ? void 0 : _f.includes("send_email_approve")) {
+                if ((_e = context.item.element.name) === null || _e === void 0 ? void 0 : _e.includes("send_email_approve")) {
                     if (context.item._status === 'start') {
                         const splitArr = context.item.element.name.split(":");
                         const [name, level] = splitArr;
@@ -114,8 +118,10 @@ class API extends common_1.Common {
                                 "empid": "AH10002500",
                                 "reason": "sick kub",
                                 "flowName": "leave_flow",
-                                "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
-                                "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
+                                "linkArrove": `${process.env.Portal_url}/email/${context.item.id}/approved/true`,
+                                "linkReject": `${process.env.Portal_url}/email/${context.item.id}/approved/false`,
+                                // "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
+                                // "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
                                 "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
                             };
                             let approverSection = res.data.data.section;
@@ -151,7 +157,7 @@ class API extends common_1.Common {
                         // console.log(context.item);
                     }
                 }
-                if ((_h = (_g = context.item.element) === null || _g === void 0 ? void 0 : _g.name) === null || _h === void 0 ? void 0 : _h.includes("end_flow")) {
+                if ((_g = (_f = context.item.element) === null || _f === void 0 ? void 0 : _f.name) === null || _g === void 0 ? void 0 : _g.includes("end_flow")) {
                     console.log(162, context.execution.instance.data.status);
                     if (context.item._status === 'end') {
                         if (context.execution.instance.data.status !== "Rejected") {
@@ -323,6 +329,58 @@ class API extends common_1.Common {
                 console.log(errors);
             }
             response.json({ errors: errors, instance });
+        })));
+        router.post('/engine/invoke', upload.array('files'), awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
+            // const data = request
+            const { task_id, field, fieldData, user, haveFile, remark } = JSON.parse(request.body.data);
+            const files = request.files;
+            console.log(406, task_id, field, fieldData, user, haveFile, remark);
+            let fileUrl = [];
+            let context;
+            let instance;
+            let errors;
+            let currentApprover = {
+                name: user.name,
+                email: user.email,
+            };
+            return;
+            try {
+                if (haveFile) {
+                    const formData = new FormData();
+                    files.forEach(element => {
+                        formData.append("files", element.buffer, element.originalname);
+                    });
+                    const headers = {
+                        headers: {
+                            // Authorization: "Bearer " + localStorage.getItem("QCAPPjwt"),
+                            "Content-Type": "multipart/form-data",
+                        },
+                    };
+                    const res = yield axios.post(`${process.env.Strapi_URL}/api/upload`, formData, headers);
+                    if (res.status === 200) {
+                        if (Array.isArray(res.data)) {
+                            res.data.forEach(element => {
+                                fileUrl.push(element.url);
+                            });
+                        }
+                    }
+                }
+                console.log(fileUrl);
+                // let Datacontext = await this.bpmnServer.engine.get(query);
+                // console.log(Datacontext);
+                // context = await bpmnServer.engine.invoke(query, data);
+                // instance = context.instance;
+                if (context && context.errors) {
+                    errors = context.errors.toString();
+                }
+                // response.setHeader('Content-Type', 'text/html');
+                response.status(200).json({ success: 'success' });
+            }
+            catch (exc) {
+                errors = exc.toString();
+                console.log(errors);
+                response.status(400).json({ errors: errors });
+            }
         })));
         router.get('/engine/get', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
             let query;

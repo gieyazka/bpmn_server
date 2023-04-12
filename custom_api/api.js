@@ -26,18 +26,33 @@ const getCurrentApprove = () => __awaiter(this, void 0, void 0, function* () {
     let test = yield Tank.find();
     return test;
 });
-const getmyTask = ({ empid, status, startDate, endDate }) => __awaiter(this, void 0, void 0, function* () {
-    console.log(23, empid, status, startDate, endDate);
-    let Tasks;
-    Tasks = mongoose.models.wf_instances || mongoose.model('wf_instances', UsersSchema);
-    let mongoData = yield Tasks.find({
+const getmyTask = ({ empid, status, startDate, endDate, flowNames }) => __awaiter(this, void 0, void 0, function* () {
+    console.log(23, empid, status, startDate, endDate, flowNames);
+    if (!empid) {
+        return "empid is undefined";
+    }
+    if (!startDate) {
+        return "startDate is undefined";
+    }
+    if (!endDate) {
+        return "endDate is undefined";
+    }
+    const Tasks = mongoose.models.wf_instances || mongoose.model('wf_instances', UsersSchema);
+    const query = {
         "data.requester.empid": empid === null || empid === void 0 ? void 0 : empid.toUpperCase(),
-        "data.status": status,
         "startedAt": {
             $gte: startDate,
             $lt: endDate
         }
-    });
+    };
+    if (status !== undefined && status !== null) {
+        query["data.status"] = status;
+    }
+    if (Array.isArray(flowNames) && flowNames.length != 0) {
+        query["data.flowName"] = { $all: flowNames };
+    }
+    console.log(query);
+    const mongoData = yield Tasks.find(query);
     console.log(mongoData.length);
     return mongoData;
 });

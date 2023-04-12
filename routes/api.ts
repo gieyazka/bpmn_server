@@ -1,5 +1,9 @@
+const axios = require('axios');
 import express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const upload = multer();
+var FormData = require('form-data');
 //import { ExecuteDecisionTable, ExecuteCondition, ExecuteExpression } from 'dmn-engine';
 var mongoose = require('mongoose');
 import FS = require('fs');
@@ -69,7 +73,7 @@ export class API extends Common {
             // console.log(174, context.item?.element.name);
 
             if (context.item) {
-                console.log(176, context.item._status, "||", context.item.element.name, context.item.element?.name === "End", context.item.element.id);
+                // console.log(176, context.item._status, "||", context.item.element.name, context.item.element?.name === "End", context.item.element.id);
                 if (context.item.element.name?.includes("start_flow")) {
 
                     if (context.item._status === 'start') {
@@ -142,8 +146,10 @@ export class API extends Common {
                                 "empid": "AH10002500",
                                 "reason": "sick kub",
                                 "flowName": "leave_flow",
-                                "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
-                                "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
+                                "linkArrove": `${process.env.Portal_url}/email/${context.item.id}/approved/true`,
+                                "linkReject": `${process.env.Portal_url}/email/${context.item.id}/approved/false`,
+                                // "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
+                                // "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
                                 "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
                             }
                             let approverSection = res.data.data.section
@@ -397,6 +403,65 @@ export class API extends Common {
                 console.log(errors);
             }
             response.json({ errors: errors, instance });
+        }));
+        router.post('/engine/invoke', upload.array('files'), awaitAppDelegateFactory(async (request, response) => {
+            // const data = request
+            const { task_id, field, fieldData, user, haveFile, remark } = JSON.parse(request.body.data);
+            const files = request.files;
+            console.log(406, task_id, field, fieldData, user, haveFile, remark);
+            let fileUrl = []
+            let context;
+            let instance;
+            let errors;
+            let currentApprover = {
+                name : user.name,
+                email : user.email,
+                
+            }
+            return ;
+            try {
+                if (haveFile) {
+                    const formData = new FormData();
+
+                    files.forEach(element => {
+
+                        formData.append("files", element.buffer, element.originalname);
+                    });
+                    const headers = {
+                        headers: {
+                            // Authorization: "Bearer " + localStorage.getItem("QCAPPjwt"),
+                            "Content-Type": "multipart/form-data",
+                        },
+                    };
+                    const res = await axios.post(`${process.env.Strapi_URL}/api/upload`, formData, headers);
+                    if (res.status === 200) {
+                        if (Array.isArray(res.data)) {
+                            res.data.forEach(element => {
+                                fileUrl.push(element.url)
+                            });
+                        }
+                    }
+                }
+                console.log(fileUrl);
+
+                // let Datacontext = await this.bpmnServer.engine.get(query);
+                // console.log(Datacontext);
+
+                // context = await bpmnServer.engine.invoke(query, data);
+                // instance = context.instance;
+
+                if (context && context.errors) {
+
+                    errors = context.errors.toString();
+                }
+                // response.setHeader('Content-Type', 'text/html');
+                response.status(200).json({ success: 'success' })
+            }
+            catch (exc) {
+                errors = exc.toString();
+                console.log(errors);
+                response.status(400).json({ errors: errors });
+            }
         }));
 
 

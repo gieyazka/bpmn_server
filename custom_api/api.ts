@@ -26,19 +26,38 @@ const getCurrentApprove = async () => {
 
 
 
-const getmyTask = async ({ empid, status, startDate, endDate }) => {
-    console.log(23, empid, status, startDate, endDate);
+const getmyTask = async ({ empid, status, startDate, endDate, flowNames }) => {
+    console.log(23, empid, status, startDate, endDate, flowNames);
+    if (!empid) {
+        return "empid is undefined";
+    }
 
-    let Tasks
-    Tasks = mongoose.models.wf_instances || mongoose.model('wf_instances', UsersSchema);
-    let mongoData = await Tasks.find({
+    if (!startDate) {
+        return "startDate is undefined";
+    }
+
+    if (!endDate) {
+        return "endDate is undefined";
+    }
+    const Tasks = mongoose.models.wf_instances || mongoose.model('wf_instances', UsersSchema);
+    const query = {
         "data.requester.empid": empid?.toUpperCase(),
-        "data.status": status,
         "startedAt": {
             $gte: startDate,
             $lt: endDate
         }
-    })
+    }
+
+    if (status !== undefined && status !== null) {
+        query["data.status"] = status
+    }
+
+    if (Array.isArray(flowNames) && flowNames.length != 0) {
+        query["data.flowName"] = { $all: flowNames }
+    }
+    console.log(query);
+
+    const mongoData = await Tasks.find(query)
     console.log(mongoData.length);
 
     return mongoData;
