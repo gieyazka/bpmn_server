@@ -67,8 +67,8 @@ class WebApp {
           dest: path.join(__dirname, 'public')
         }));*/
         app.use(logger('dev'));
-        app.use(bodyParser.json());
-        app.use(bodyParser.urlencoded({ extended: true }));
+        app.use(bodyParser.json({ limit: '100mb' }));
+        app.use(bodyParser.urlencoded({ limit: '1000mb', extended: true }));
         app.use(session({
             resave: true,
             saveUninitialized: true,

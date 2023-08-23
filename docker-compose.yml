@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      no_cache: true
+    ports:
+      - '3009:3000'
+    depends_on:
+      - db
+    environment:
+      - MONGO_DB_URL=mongodb://db:27017/bpmn
+
+    networks:
+      - my-network
+    restart: always
+
+  db:
+    image: mongo
+    restart: always
+    # privileged: true
+    ports:
+      - '27018:27017'
+    volumes:
+  
+      - /opt/workflowData:/data/db
+
+    networks:
+      - my-network
+networks:
+  my-network:
+
+

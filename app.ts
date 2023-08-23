@@ -1,4 +1,4 @@
-console.log("bpmn-server WebApp.ts version "+ getVersion());
+console.log("bpmn-server WebApp.ts version " + getVersion());
 
 import debug = require('debug');
 
@@ -50,22 +50,22 @@ function getVersion() {
 
 export class WebApp {
 	app;
-//NOPASSPORT 	passport;
-//NOPASSPORT passportConfig;
+	//NOPASSPORT 	passport;
+	//NOPASSPORT passportConfig;
 	bpmnServer;
 
 	constructor() {
 
-//NOPASSPORT 		this.passport = passport;
-//NOPASSPORT 		this.passportConfig = require('./config/passport');
+		//NOPASSPORT 		this.passport = passport;
+		//NOPASSPORT 		this.passportConfig = require('./config/passport');
 
 		this.initExpress();
 		this.initMongo();
-//NOPASSPORT 		this.initPassport();
+		//NOPASSPORT 		this.initPassport();
 		const wflogger = new Logger({ toConsole: false });
 
 
-		this.bpmnServer = new BPMNServer(config,wflogger);
+		this.bpmnServer = new BPMNServer(config, wflogger);
 
 		this.setupExpress();
 	}
@@ -89,8 +89,8 @@ export class WebApp {
 		  dest: path.join(__dirname, 'public')
 		}));*/
 		app.use(logger('dev'));
-		app.use(bodyParser.json());
-		app.use(bodyParser.urlencoded({ extended: true }));
+		app.use(bodyParser.json({ limit: '100mb' }));
+		app.use(bodyParser.urlencoded({ limit: '1000mb', extended: true }));
 		app.use(session({
 			resave: true,
 			saveUninitialized: true,
@@ -168,7 +168,7 @@ export class WebApp {
 			next();
 		});
 		*/
-		
+
 
 		this.setupRoutes();
 
@@ -189,7 +189,7 @@ export class WebApp {
 		 * Start Express server.
 		 */
 		app.listen(app.get('port'), () => {
-//			console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('?'), app.get('port'), app.get('env'));
+			//			console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('?'), app.get('port'), app.get('env'));
 			console.log('  Press CTRL-C to stop\n');
 		});
 		return app;

@@ -29,5 +29,11 @@ const getHead = ({ empid }) => __awaiter(this, void 0, void 0, function* () {
     }).catch(err => console.log(err));
     return getEmpByLevel;
 });
-module.exports = { checkBoolLevel, getEmpPosition, getHead, };
+const findHead = ({ company, department, section, level }) => __awaiter(this, void 0, void 0, function* () {
+    const getEmpByLevel = yield axios.post(`${process.env.Strapi_URL}/api/orgs/findHead`, {
+        company, department, section, level
+    }).catch(err => console.log(err));
+    return getEmpByLevel;
+});
+module.exports = { checkBoolLevel, getEmpPosition, getHead, findHead };
 //# sourceMappingURL=check_level.js.map

@@ -1,5 +1,5 @@
-const { checkBoolLevel, getEmpPosition, getHead  } = require('./check_level')
+const { checkBoolLevel, getEmpPosition, getHead ,findHead } = require('./check_level')
 
 export default {
-    checkBoolLevel, getEmpPosition, getHead 
+    checkBoolLevel, getEmpPosition, getHead ,findHead
 }

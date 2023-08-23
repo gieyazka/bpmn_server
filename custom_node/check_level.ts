@@ -12,9 +12,9 @@ const checkBoolLevel = async ({ condition, empid, level, }: {
 const getEmpPosition = async ({ company, department, section, level }: {
     level: string, company: string, department: string, section: string
 }) => {
-  
+
     const getEmpByLevel = await axios.post(`${process.env.Strapi_URL}/api/orgs/searchOrg`, {
-        company,
+        company,    
         department,
         section,
         level
@@ -33,8 +33,19 @@ const getHead = async ({ empid }: {
 
     return getEmpByLevel
 }
+const findHead = async ({ company, department, section, level }: {
+    level: string, company: string, department: string, section: string
+}) => {
+ 
+    const getEmpByLevel = await axios.post(`${process.env.Strapi_URL}/api/orgs/findHead`, {
+        company, department, section, level
+    }).catch(err => console.log(err)
+    )
+
+    return getEmpByLevel
+}
 
 
 
 
-module.exports = { checkBoolLevel, getEmpPosition, getHead, }
+module.exports = { checkBoolLevel, getEmpPosition, getHead, findHead }

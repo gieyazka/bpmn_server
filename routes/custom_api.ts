@@ -8,7 +8,7 @@ import { BPMNServer, Behaviour_names, CacheManager, Logger, dateDiff } from '..'
 import { configuration as config, configuration } from '../configuration';
 
 import { Common } from './common';
-import CustomApi from '../custom_api/index'
+import CustomApi from '../custom_function/index'
 import CustomNode from '../custom_node/index'
 
 const AwaitEventEmitter = require('await-event-emitter').default
@@ -57,114 +57,9 @@ export class API extends Common {
 
         var router = express.Router();
         // var bpmnServer = this.bpmnServer;
-        const logger = new Logger({
-            toConsole: false
-        });
-
-        const bpmnServer = new BPMNServer(configuration, logger, { cron: false, noWait: false });
-        const listener = new AwaitEventEmitter()
-        listener.on('all', async ({ context, event }) => {
-            // console.log(174, context.item?.element.name);
-
-            if (context.item) {
-                console.log(176, context.item._status, "||", context.item.element.name, context.item.element.id);
-                if (context.item.element.name?.includes("check_rule")) {
-
-                    if (context.item._status === 'start') {
-                        const [name, condition, level] = context.item.element.name.split(":")
-                        const {
-                            empid, company, department, section
-                        } = context.execution.instance.data
-
-                        const res = await CustomNode.checkBoolLevel({ empid, condition, level, })
-
-                        context.item.token.execution.output = { checkStatus: res.data.status }
-                        // console.log(context.item);
 
 
-                    }
-                }
-                if (context.item.element.name?.includes("get_position")) {
 
-                    if (context.item._status === 'start') {
-                        const [name, level] = context.item.element.name.split(":")
-                        const {
-                            company, department, section
-                        } = context.execution.instance.data
-                        const res = await CustomNode.getEmpPosition({ company, department, section, level })
-                        context.item.token.execution.output = { checkStatus: res.data.status, positionData: res.data.data?.employee }
-                    }
-                }
-                if (context.item.element.name?.includes("send_email_approve")) {
-
-                    if (context.item._status === 'start') {
-                        const [name, level] = context.item.element.name.split(":")
-                        const {
-                            empid, company, department, section
-                        } = context.execution.instance.data
-                        let res
-                        if (level === 'head') {
-                            ///get Head
-                            res = await CustomNode.getHead({ empid })
-                        } else {
-
-                            res = await CustomNode.getEmpPosition({ company, department, section, level })
-                        }
-                        console.log(116, res.data);
-                        let approverData: any = { company, department, section, level }
-                        if (res.data.status) {
-                            // send Email
-                            let emailData = {
-                                "empid": "AH10002500",
-                                "reason": "sick kub",
-                                "flowName": "leave_flow",
-                                "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
-                                "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
-                                "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
-                            }
-                            let approverSection = res.data.data.section
-                            let approverEmployee = res.data.data.employee
-                            let approverLevel = res.data.data.level
-                            approverData = {
-                                name: approverEmployee.prefix + "." + approverEmployee.firstName + " " + approverEmployee.lastName,
-                                email: approverEmployee.email,
-                                emp: approverEmployee.empid,
-                                position: approverLevel.position,
-                                priority: approverLevel.priority,
-                                level: approverLevel.level,
-                                section: approverSection.name,
-                                company, department,
-                            }
-
-                            await CustomApi.sendStrapi_email(emailData)
-                        }
-
-                        context.execution.instance.data.currentApprover = approverData
-                    }
-
-
-                    if (context.item._status === 'end') {
-
-                        context.item.token.execution.output = { checkStatus: context.execution.instance.data.approved }
-                        let appList = context.execution.instance.data.approverList
- || []
-                        appList.push(context.execution.instance.data.currentApprover)
-                        context.execution.instance.data.approverList
- = appList
-                        context.execution.instance.data.currentApprover = null
-                        // console.log(context.item);
-
-
-                    }
-                }
-                // console.log("name : ", context.item.element.name);
-                console.log("Input : ", context.execution.execution.input);
-                console.log("DATA :", context.execution.instance.data);
-                console.log("Output : ", context.item.token.execution.output);
-            }
-        });
-
-        bpmnServer.listener = listener
 
         router.get('/current_approve', awaitAppDelegateFactory(async (request, response) => {
             // console.log(200, mongoose.connection.readyState);
@@ -201,16 +96,42 @@ export class API extends Common {
                 response.json({ error: exc.toString() });
             }
         }));
+
+        router.post('/getLeaveQuota', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+            // console.log(200, mongoose.connection.readyState);
+            try {
+
+                let data = request.body;
+                const leaveQuota = await CustomApi.getLeaveQuota(data);
+                response.json(leaveQuota);
+            }
+            catch (exc) {
+                response.json({ error: exc.toString() });
+            }
+        }));
+        router.post('/getLeaveDay', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+            // console.log(200, mongoose.connection.readyState);
+            try {
+
+                let data = request.body;
+                const leaveDay = await CustomApi.getLeaveDay(data);
+                response.json(leaveDay);
+            }
+            catch (exc) {
+                response.json({ error: exc.toString() });
+            }
+        }));
+
+
         router.post('/find_my_task', awaitAppDelegateFactory(async (request, response) => {
             // console.log(200, mongoose.connection.readyState);
             try {
                 let name = request.params.name;
                 if (!name)
                     name = request.body.name;
-                console.log(' starting ' + name);
                 let data = request.body.data;
-                console.log(data);
-
+                // console.log(data);
+                console.log('find_my_task', data)
                 let userId;
 
                 let startNodeId, options = {}, userKey;
@@ -231,8 +152,75 @@ export class API extends Common {
 
                 // console.log(context);
                 const mongoData = await CustomApi.getmyTask(data);
-                console.log(234,mongoData);
-                
+                // console.log(234,mongoData);
+                console.log(mongoData.length);
+                response.json(mongoData);
+            }
+            catch (exc) {
+                response.json({ error: exc.toString() });
+            }
+        }));
+        router.post('/hrCancel', awaitAppDelegateFactory(async (request, response) => {
+            try {
+                let name = request.params.name;
+                if (!name)
+                    name = request.body.name;
+                let data = request.body;
+                // console.log(data);
+                const mongoData = await CustomApi.hrCancel(data);
+                response.json(mongoData);
+            }
+            catch (exc) {
+                response.status(404).json({ error: exc.toString() });
+            }
+        }));
+        router.post('/hrSetLeave', awaitAppDelegateFactory(async (request, response) => {
+            try {
+                let name = request.params.name;
+                if (!name)
+                    name = request.body.name;
+                let data = request.body;
+
+
+
+
+                const mongoData = await CustomApi.hrSetLeave(data);
+
+                response.json(mongoData);
+                // response.json("test");
+            }
+            catch (exc) {
+                response.status(404).json({ error: exc.toString() });
+            }
+        }));
+        router.post('/getTaskByItemID', awaitAppDelegateFactory(async (request, response) => {
+            // console.log(200, mongoose.connection.readyState);
+            try {
+                let name = request.params.name;
+                if (!name)
+                    name = request.body.name;
+                let data = request.body.data;
+                console.log(data);
+
+                let userId;
+
+                let startNodeId, options = {}, userKey;
+                if (request.body.startNodeId) {
+                    startNodeId = request.body.startNodeId;
+                }
+                if (request.body.options) {
+                    options = request.body.options;
+                }
+
+                if (request.body.userId) {
+                    userId = request.body.userId;
+                }
+                // customFn()
+                userKey = this.bpmnServer.iam.getRemoteUser(userId);
+
+
+                // console.log(context);
+                const mongoData = await CustomApi.getTaskByItemID(data);
                 response.json(mongoData);
             }
             catch (exc) {
@@ -241,14 +229,46 @@ export class API extends Common {
         }));
 
         router.post('/find_user_approve', awaitAppDelegateFactory(async (request, response) => {
-            // console.log(200, mongoose.connection.readyState);
+
             try {
                 let name = request.params.name;
                 if (!name)
                     name = request.body.name;
-                console.log(' starting ' + name);
                 let data = request.body.data;
-                // console.log(data);
+                console.log('data', data)
+                let userId;
+
+                let startNodeId, options = {}, userKey;
+                if (request.body.startNodeId) {
+                    startNodeId = request.body.startNodeId;
+                }
+                if (request.body.options) {
+                    options = request.body.options;
+                }
+
+                if (request.body.userId) {
+                    userId = request.body.userId;
+                }
+                // customFn()
+                userKey = this.bpmnServer.iam.getRemoteUser(userId);
+
+
+
+
+                const mongoData = await CustomApi.getCurrentApproveTask(data);
+                response.json(mongoData);
+            }
+            catch (exc) {
+                response.json({ error: exc.toString() });
+            }
+        }));
+        router.post('/find_action_logs', awaitAppDelegateFactory(async (request, response) => {
+
+            try {
+                let name = request.params.name;
+                if (!name)
+                    name = request.body.name;
+                let data = request.body.data;
 
                 let userId;
 
@@ -268,9 +288,8 @@ export class API extends Common {
 
 
 
-                // console.log(context);
-                const mongoData = await CustomApi.getCurrentApproveTask(data);
 
+                const mongoData = await CustomApi.getAction_logs(data);
                 response.json(mongoData);
             }
             catch (exc) {

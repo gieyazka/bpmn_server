@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.API = void 0;
 const axios = require('axios');
@@ -21,7 +32,7 @@ var mongoose = require('mongoose');
 const __1 = require("..");
 const configuration_1 = require("../configuration");
 const common_1 = require("./common");
-const index_1 = require("../custom_api/index");
+const index_1 = require("../custom_function/index");
 const index_2 = require("../custom_node/index");
 const nanoid_1 = require("nanoid");
 const dayjs = require('dayjs');
@@ -63,114 +74,348 @@ class API extends common_1.Common {
         const bpmnServer = new __1.BPMNServer(configuration_1.configuration, logger, { cron: false, noWait: false });
         const listener = new AwaitEventEmitter();
         listener.on('all', ({ context, event }) => __awaiter(this, void 0, void 0, function* () {
-            // console.log(174, context.item?.element.name);
-            var _a, _b, _c, _d, _e, _f, _g;
-            if (context.item) {
-                // console.log(176, context.item._status, "||", context.item.element.name, context.item.element?.name === "End", context.item.element.id);
-                if ((_a = context.item.element.name) === null || _a === void 0 ? void 0 : _a.includes("start_flow")) {
-                    if (context.item._status === 'start') {
-                        context.execution.instance.task_id = `EF-${dayjs().format('YYYYMMDD')}-${(0, nanoid_1.nanoid)(6)}`;
-                    }
-                }
-                if ((_b = context.item.element.name) === null || _b === void 0 ? void 0 : _b.includes("check_rule")) {
-                    if (context.item._status === 'start') {
-                        const [name, condition, level] = context.item.element.name.split(":");
-                        //TODO: add company for check if need
-                        const { empid, company, department, section } = context.execution.instance.data.requester;
-                        const res = yield index_2.default.checkBoolLevel({ empid, condition, level, });
-                        context.item.token.execution.output = { checkStatus: res.data.status };
-                        // console.log(context.item);
-                    }
-                }
-                if ((_c = context.item.element.name) === null || _c === void 0 ? void 0 : _c.includes("get_position")) {
-                    if (context.item._status === 'start') {
-                        const splitArr = context.item.element.name.split(":");
-                        const [name, level] = splitArr;
-                        let { company, department, section } = context.execution.instance.data.requester;
-                        if (splitArr.length > 2) {
-                            [company, department, section] = splitArr.slice(2);
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+            try {
+                // console.log(174, context.item?.element.name);
+                if (context.item) {
+                    // console.log(176, context.item._status, "||", context.item.element.name, context.item.element?.name === "End", context.item.element.id);
+                    if ((_a = context.item.element.name) === null || _a === void 0 ? void 0 : _a.includes("start_flow")) {
+                        if (context.item._status === 'start') {
+                            if (context.execution.instance.data.requester !== undefined) {
+                                if (context.execution.instance.data.requester.name === undefined) {
+                                    //TODO : get name
+                                    // console.log(84);
+                                    const nanoid = (0, nanoid_1.customAlphabet)('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 2);
+                                    context.execution.instance.task_id = `EF-${dayjs().format('YYMMDDmmss')}-${nanoid()}`;
+                                    context.execution.instance.createdAt = dayjs().format('YYYYMMDD');
+                                    const employee = yield index_1.default.getUserInfo(context.execution.instance.data.requester.empid);
+                                    console.log('90', employee.data);
+                                    if (employee.data.status === true) {
+                                        const empData = employee.data.employee;
+                                        context.execution.instance.data.requester.name = empData.name_en;
+                                        context.execution.instance.data.requester.name_th = (empData.title ? empData.title : "") + empData.name_th + " " + empData.surname_th;
+                                        context.execution.instance.data.requester.email = (_b = empData.email) !== null && _b !== void 0 ? _b : null;
+                                    }
+                                    else {
+                                        throw new Error("No employee id");
+                                    }
+                                    // context.execution.instance.data.requester.level = employee.level.level
+                                }
+                            }
+                            //TODO: check in payload from resend
+                            const requester = context.execution.instance.data.requester;
+                            const submitActionLog = {
+                                name: requester.name,
+                                email: requester.email,
+                                empid: requester.empid,
+                                position: requester.position,
+                                level: requester.level,
+                                section: requester.section,
+                                sub_section: requester.sub_section,
+                                company: requester.company,
+                                department: requester.department,
+                                filesURL: null,
+                                date: dayjs().toDate(),
+                                action: "Submit",
+                                remark: "Submit form",
+                            };
+                            const refID = context.execution.instance.data.refID;
+                            if (refID) {
+                                submitActionLog.remark = `from Task_ID : ${refID}`;
+                                context.execution.instance.issueDate = dayjs(context.execution.instance.data.issueDate).toDate();
+                                context.execution.instance.data.newTaskID = context.execution.instance.task_id;
+                                delete context.execution.instance.data.issueDate;
+                                yield index_1.default.setDuplicate(context.execution.instance.data.refID);
+                            }
+                            else {
+                                context.execution.instance.issueDate = dayjs().toDate();
+                            }
+                            context.execution.instance.data.actionLog = [submitActionLog];
                         }
-                        const res = yield index_2.default.getEmpPosition({ company, department, section, level });
-                        context.item.token.execution.output = { checkStatus: res.data.status, positionData: (_d = res.data.data) === null || _d === void 0 ? void 0 : _d.employee };
                     }
-                }
-                if ((_e = context.item.element.name) === null || _e === void 0 ? void 0 : _e.includes("send_email_approve")) {
-                    if (context.item._status === 'start') {
-                        const splitArr = context.item.element.name.split(":");
-                        const [name, level] = splitArr;
-                        let { empid, company, department, section } = context.execution.instance.data.requester;
-                        let res;
-                        if (level === 'head') {
-                            ///get Head
-                            res = yield index_2.default.getHead({ empid });
+                    if ((_c = context.item.element.name) === null || _c === void 0 ? void 0 : _c.includes("check_resend")) {
+                        if (context.item._status === 'start') {
                         }
-                        else {
+                    }
+                    if ((_d = context.item.element.name) === null || _d === void 0 ? void 0 : _d.includes("check_rule")) {
+                        if (context.item._status === 'start') {
+                            const [name, condition, level] = context.item.element.name.split(":");
+                            //TODO: add company for check if need
+                            const { empid, company, department, section } = context.execution.instance.data.requester;
+                            const res = yield index_2.default.checkBoolLevel({ empid, condition, level, });
+                            context.item.token.execution.output = { checkStatus: (_e = res.data.status) !== null && _e !== void 0 ? _e : false };
+                            // console.log(context.item);
+                        }
+                    }
+                    if ((_f = context.item.element.name) === null || _f === void 0 ? void 0 : _f.includes("get_position")) {
+                        if (context.item._status === 'start') {
+                            const splitArr = context.item.element.name.split(":");
+                            const [name, level] = splitArr;
+                            let { company, department, section } = context.execution.instance.data.requester;
                             if (splitArr.length > 2) {
                                 [company, department, section] = splitArr.slice(2);
                             }
-                            res = yield index_2.default.getEmpPosition({ company, department, section, level });
+                            console.table({ company, department, section, level });
+                            const res = yield index_2.default.getEmpPosition({ company, department, section, level });
+                            console.log('res', res.data);
+                            // throw new Error("test");
+                            context.item.token.execution.output = { checkStatus: res.data.status, positionData: (_g = res.data.data) === null || _g === void 0 ? void 0 : _g.employee };
                         }
-                        console.log(116, res.data);
-                        let approverData = { company, department, section, level };
-                        if (res.data.status) {
-                            // send Email
+                    }
+                    if ((_h = context.item.element.name) === null || _h === void 0 ? void 0 : _h.includes("send_email_resend")) {
+                        if (context.item._status === 'start') {
                             let emailData = {
                                 "empid": "AH10002500",
                                 "reason": "sick kub",
+                                "data": context.execution.instance.data,
                                 "flowName": "leave_flow",
+                                "linkArrove": `${process.env.Portal_url}/email/${context.item.id}/resend/true`,
+                                "linkReject": `${process.env.Portal_url}/email/${context.item.id}/resend/false`,
+                                // "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
+                                // "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
+                                "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
+                            };
+                            // const resEmail = CustomApi.sendStrapi_email(emailData)
+                            // context.execution.instance.data.status = "Waiting"
+                        }
+                        if (context.item._status === 'end') {
+                            //onEmail Action
+                            context.item.token.execution.output = { checkStatus: context.execution.instance.data.resend };
+                            // let appList = context.execution.instance.data.approverList
+                            //     || []
+                            if (context.execution.instance.data.flowName === "leave_flow") {
+                                context.execution.instance.data.approverList = [];
+                            }
+                            if (context.execution.instance.data.requester !== undefined) {
+                                if (context.execution.instance.data.requester.name === undefined) {
+                                    const employee = yield index_1.default.getUserInfo(context.execution.instance.data.requester.empid);
+                                    if (employee.data.status === true) {
+                                        const empData = employee.data.employee;
+                                        context.execution.instance.data.requester.name = empData.name_en;
+                                        context.execution.instance.data.requester.name_th = (empData.title ? empData.title : "") + empData.name_th + " " + empData.surname_th;
+                                        context.execution.instance.data.requester.email = (_j = empData.email) !== null && _j !== void 0 ? _j : null;
+                                    }
+                                    else {
+                                        throw new Error("No employee id");
+                                    }
+                                    // const hierachies = await CustomApi.getMyHierachies(context.execution.instance.data.requester.empid)
+                                    // // console.log(86, hierachies)
+                                    // context.execution.instance.data.requester.name = hierachies.employee.prefix ? hierachies.employee.prefix + "." : "" + hierachies.employee.firstName + " " + hierachies.employee.lastName
+                                    // context.execution.instance.data.requester.level = hierachies.level.level
+                                }
+                            }
+                            let action = "Resubmit";
+                            if (context.execution.execution.input.resend === false) {
+                                context.execution.instance.data.status = "Cancel";
+                                action = "Cancle";
+                            }
+                            let logList = context.execution.instance.data.actionLog
+                                || [];
+                            let arriveTime = null;
+                            if (logList.length > 0) {
+                                arriveTime = dayjs(logList[logList.length - 1].date).toDate();
+                            }
+                            const requester = context.execution.instance.data.requester;
+                            logList.push({
+                                name: requester.name,
+                                email: requester.email,
+                                empid: requester.empid,
+                                position: requester.position,
+                                level: requester.level,
+                                section: requester.section,
+                                sub_section: requester.sub_section,
+                                company: requester.company,
+                                arriveTime,
+                                department: requester.department,
+                                date: dayjs().toDate(),
+                                filesURL: null,
+                                action: action,
+                                remark: context.execution.execution.input.remark,
+                            });
+                            console.log('248', logList);
+                            context.execution.instance.data.actionLog = logList;
+                        }
+                    }
+                    if ((_k = context.item.element.name) === null || _k === void 0 ? void 0 : _k.includes("send_email_approve")) {
+                        if (context.item._status === 'start') {
+                            const splitArr = context.item.element.name.split(":");
+                            const [name, levelFlow] = splitArr;
+                            let { empid, company, department, section } = context.execution.instance.data.requester;
+                            let res;
+                            if (levelFlow === 'head') {
+                                ///get Head
+                                res = yield index_2.default.getHead({ empid });
+                            }
+                            else if (levelFlow === 'findHead') {
+                                let level = context.execution.instance.data.requester.level;
+                                let approveList = context.execution.instance.data.approverList;
+                                console.log('approveList', approveList);
+                                if (approveList !== undefined) {
+                                    console.log("last App Level ", approveList[approveList.length - 1].level);
+                                    level = approveList[approveList.length - 1].level;
+                                    company = approveList[approveList.length - 1].company;
+                                    department = approveList[approveList.length - 1].department;
+                                    section = approveList[approveList.length - 1].section;
+                                }
+                                console.table({ company, department, section, level });
+                                if (!level) {
+                                    level = "M4";
+                                }
+                                console.table({ company, department, section, level });
+                                res = yield index_2.default.findHead({ company, department, section, level });
+                                console.log('320', res.data);
+                            }
+                            else {
+                                if (splitArr.length > 2) {
+                                    [company, department, section] = splitArr.slice(2);
+                                }
+                                res = yield index_2.default.getEmpPosition({ company, department, section, level: levelFlow });
+                            }
+                            // console.log(116, res.data);
+                            // console.log('238', levelFlow)
+                            let approverData = { company, department, section, levelFlow };
+                            if (res.data.status) {
+                                // send Email
+                                let approverSection = res.data.data.section;
+                                let approverEmployee = res.data.data.employee;
+                                let approverLevel = res.data.data.level;
+                                approverData = {
+                                    name: approverEmployee.prefix ? approverEmployee.prefix + "." : "" + "" + approverEmployee.firstName + " " + approverEmployee.lastName,
+                                    email: approverEmployee.email,
+                                    arriveTime: dayjs().toDate(),
+                                    // empid: approverEmployee.empid,
+                                    empid: "AH10002500",
+                                    position: approverLevel.position,
+                                    priority: approverLevel.priority,
+                                    // level: "E2",
+                                    level: approverLevel.level,
+                                    section: approverSection ? approverSection.name : null,
+                                    company, department,
+                                };
+                            }
+                            let emailData = {
+                                // "empid": approverData.empid,
+                                "empid": "AH10002500",
+                                "data": context.execution.instance.data,
+                                "from": context.execution.instance.data.requester.name,
+                                "reason": context.execution.instance.data.reason,
+                                "flowName": context.execution.instance.data.flowName,
                                 "linkArrove": `${process.env.Portal_url}/email/${context.item.id}/approved/true`,
                                 "linkReject": `${process.env.Portal_url}/email/${context.item.id}/approved/false`,
                                 // "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
                                 // "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
                                 "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
                             };
-                            let approverSection = res.data.data.section;
-                            let approverEmployee = res.data.data.employee;
-                            let approverLevel = res.data.data.level;
-                            approverData = {
-                                name: approverEmployee.prefix + "." + approverEmployee.firstName + " " + approverEmployee.lastName,
-                                email: approverEmployee.email,
-                                empid: approverEmployee.empid,
-                                position: approverLevel.position,
-                                priority: approverLevel.priority,
-                                level: approverLevel.level,
-                                section: approverSection.name,
-                                company, department,
-                            };
-                            const resEmail = yield index_1.default.sendStrapi_email(emailData);
+                            const resEmail = index_1.default.sendStrapi_email(emailData);
+                            context.execution.instance.data.currentApprover = approverData;
+                            context.execution.instance.data.status = "Waiting";
                         }
-                        context.execution.instance.data.currentApprover = approverData;
-                        context.execution.instance.data.status = "Waiting";
-                    }
-                    if (context.item._status === 'end') {
-                        //onEmail Action
-                        context.item.token.execution.output = { checkStatus: context.execution.instance.data.approved };
-                        let appList = context.execution.instance.data.approverList
-                            || [];
-                        let newApprover = Object.assign(Object.assign({}, context.execution.instance.data.currentApprover), { date: dayjs().toISOString(), action: context.execution.instance.data.approved ? "Approved" : "Rejected" });
-                        console.log(context.execution.execution.input);
-                        appList.push(newApprover);
-                        context.execution.instance.data.approverList
-                            = appList;
-                        context.execution.instance.data.currentApprover = null;
-                        context.execution.instance.data.status = context.execution.instance.data.approved ? "Waiting" : "Rejected";
-                        // console.log(context.item);
-                    }
-                }
-                if ((_g = (_f = context.item.element) === null || _f === void 0 ? void 0 : _f.name) === null || _g === void 0 ? void 0 : _g.includes("end_flow")) {
-                    console.log(162, context.execution.instance.data.status);
-                    if (context.item._status === 'end') {
-                        if (context.execution.instance.data.status !== "Rejected") {
-                            context.execution.instance.data.status = "Success";
+                        if (context.item._status === 'end') {
+                            //onEmail Action
+                            const isApprove = context.execution.execution.input.additionApprover.approved;
+                            let appList = context.execution.instance.data.approverList
+                                || [];
+                            let logList = context.execution.instance.data.actionLog
+                                || [];
+                            let newApprover = Object.assign(Object.assign(Object.assign({}, context.execution.instance.data.currentApprover), context.execution.instance.data.newCurrentApprover), { date: dayjs().toISOString(), action: context.execution.instance.data.additionApprover.approved ? "Approved" : "Rejected" });
+                            if (context.execution.instance.data.additionApprover !== undefined) {
+                                context.item.token.execution.output = { checkStatus: isApprove };
+                                newApprover = Object.assign(Object.assign({}, newApprover), context.execution.instance.data.additionApprover);
+                            }
+                            logList.push(newApprover);
+                            appList.push(newApprover);
+                            context.execution.instance.data.actionLog = logList;
+                            context.execution.instance.data.approverList
+                                = appList;
+                            context.execution.instance.data.currentApprover = null;
+                            context.execution.instance.data.status = isApprove ? "Waiting" : "Rejected";
+                            delete context.execution.instance.data.newCurrentApprover;
+                            delete context.execution.instance.data.approved;
+                            delete context.execution.instance.data.additionApprover;
+                            // console.log( context.item);
                         }
                     }
+                    if ((_l = context.item.element.name) === null || _l === void 0 ? void 0 : _l.includes("send_approve")) {
+                        if (context.item._status === 'start') {
+                            const splitArr = context.item.element.name.split(":");
+                            const [name, levelFlow] = splitArr;
+                            const userInfo = yield index_1.default.getUserInfo(context.execution.instance.data.requester.empid);
+                            if (userInfo.data.status) {
+                                let { company, emp_type } = userInfo.data.employee;
+                                if (emp_type === "Daily" || emp_type === "Monthly") {
+                                }
+                                else {
+                                    company = "Sub_Contract";
+                                }
+                                const getHrLeave = yield index_1.default.getHRLeave(company, emp_type);
+                                if (!getHrLeave) {
+                                    throw new Error("NO Hr leave Conditions");
+                                }
+                                const checkHr = getHrLeave.responsible.find(d => {
+                                    return d.type === emp_type;
+                                });
+                                const hrLdap = yield index_1.default.getLDAPDataByEmpID(checkHr.empID);
+                                console.log('hrLdap', hrLdap.data.employee);
+                                const approverData = {
+                                    name: hrLdap.data.employee.name,
+                                    email: hrLdap.data.employee.email,
+                                    arriveTime: dayjs().toDate(),
+                                    empid: checkHr.empID,
+                                    // empid: "AH10002500",
+                                    // position: approverLevel.position,
+                                    // priority: approverLevel.priority,
+                                    // level: "E2",
+                                    // level: approverLevel.level,
+                                    section: null,
+                                    company: hrLdap.data.employee.company, department: hrLdap.data.employee.department,
+                                };
+                                context.execution.instance.data.currentApprover = approverData;
+                                context.execution.instance.data.status = "Waiting";
+                            }
+                            // throw new Error("test Hr");
+                        }
+                        if (context.item._status === 'end') {
+                            //onEmail Action
+                            const isApprove = context.execution.execution.input.additionApprover.approved;
+                            let appList = context.execution.instance.data.approverList
+                                || [];
+                            let logList = context.execution.instance.data.actionLog
+                                || [];
+                            let newApprover = Object.assign(Object.assign(Object.assign({}, context.execution.instance.data.currentApprover), context.execution.instance.data.newCurrentApprover), { date: dayjs().toISOString(), action: context.execution.instance.data.additionApprover.approved ? "Approved" : "Rejected" });
+                            if (context.execution.instance.data.additionApprover !== undefined) {
+                                context.item.token.execution.output = { checkStatus: isApprove };
+                                newApprover = Object.assign(Object.assign({}, newApprover), context.execution.instance.data.additionApprover);
+                            }
+                            logList.push(newApprover);
+                            appList.push(newApprover);
+                            context.execution.instance.data.actionLog = logList;
+                            context.execution.instance.data.approverList
+                                = appList;
+                            context.execution.instance.data.currentApprover = null;
+                            context.execution.instance.data.status = isApprove ? "Waiting" : "Rejected";
+                            delete context.execution.instance.data.newCurrentApprover;
+                            delete context.execution.instance.data.approved;
+                            delete context.execution.instance.data.additionApprover;
+                            // console.log( context.item);
+                        }
+                    }
+                    if ((_o = (_m = context.item.element) === null || _m === void 0 ? void 0 : _m.name) === null || _o === void 0 ? void 0 : _o.includes("end_flow")) {
+                        if (context.item._status === 'end') {
+                            if (context.execution.instance.data.status !== "Rejected") {
+                                context.execution.instance.data.status = "Success";
+                            }
+                        }
+                    }
+                    // console.log("name : ", context.item.element.name);
+                    // console.log("Input : ", context.execution.execution.input);
+                    // console.log("DATA :", context.execution.instance.data);
+                    // console.log("Output : ", context.item.token.execution.output);
                 }
-                // console.log("name : ", context.item.element.name);
-                // console.log("Input : ", context.execution.execution.input);
-                // console.log("DATA :", context.execution.instance.data);
-                // console.log("Output : ", context.item.token.execution.output);
+                context.execution.instance.data.lastUpdate = dayjs().toISOString();
             }
-            context.execution.instance.data.lastUpdate = dayjs().toISOString();
+            catch (error) {
+                throw new Error(error);
+            }
         }));
         bpmnServer.listener = listener;
         router.get('/datastore/findItems', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
@@ -236,6 +481,7 @@ class API extends common_1.Common {
                     name = request.body.name;
                 console.log(' starting ' + name);
                 let data = request.body.data;
+                console.log(430, name, data);
                 let userId;
                 let startNodeId, options = {}, userKey;
                 if (request.body.startNodeId) {
@@ -250,10 +496,24 @@ class API extends common_1.Common {
                 // customFn()
                 userKey = this.bpmnServer.iam.getRemoteUser(userId);
                 let context;
-                context = yield bpmnServer.engine.start(name, data, null);
+                try {
+                    context = yield bpmnServer.engine.start(name, data, null).then(res => res).catch(err => {
+                        return ({ status: 400, err: err.message });
+                    });
+                    if (context.status === 400) {
+                        response.status(400).json(context);
+                    }
+                    else {
+                        response.json(context.instance);
+                    }
+                }
+                catch (error) {
+                    console.log('error', error);
+                    response.status(400).json(error);
+                }
                 // console.log(context);
                 // console.log(204,await CustomApi.getCurrentApprove());
-                response.json(context.instance);
+                // response.json(context.instance);
             }
             catch (exc) {
                 response.json({ error: exc.toString() });
@@ -331,19 +591,110 @@ class API extends common_1.Common {
             response.json({ errors: errors, instance });
         })));
         router.post('/engine/invoke', upload.array('files'), awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
+            var _p;
             // const data = request
-            const { task_id, field, fieldData, user, haveFile, remark } = JSON.parse(request.body.data);
+            console.log(request.body);
+            // return 
+            const _q = JSON.parse(request.body.data), { task_id, field, fieldData, user, haveFile, remark } = _q, receiveData = __rest(_q, ["task_id", "field", "fieldData", "user", "haveFile", "remark"]);
+            if (!task_id) {
+                response.status(404).json({ error: "invalid task_id" });
+            }
             const files = request.files;
             console.log(406, task_id, field, fieldData, user, haveFile, remark);
-            let fileUrl = [];
+            let filesURL = [];
             let context;
             let instance;
             let errors;
-            let currentApprover = {
-                name: user.name,
-                email: user.email,
-            };
-            return;
+            // return ;
+            try {
+                let query, data;
+                query =
+                    {
+                        "items.id": task_id
+                    };
+                data = Object.assign({}, receiveData);
+                if (field) {
+                    if (haveFile) {
+                        const formData = new FormData();
+                        files.forEach(element => {
+                            formData.append("files", element.buffer, element.originalname);
+                        });
+                        const headers = {
+                            headers: {
+                                // Authorization: "Bearer " + localStorage.getItem("QCAPPjwt"),
+                                "Content-Type": "multipart/form-data",
+                            },
+                        };
+                        const res = yield axios.post(`${process.env.Strapi_URL}/api/upload`, formData, headers);
+                        if (res.status === 200) {
+                            if (Array.isArray(res.data)) {
+                                res.data.forEach(element => {
+                                    filesURL.push(element.url);
+                                });
+                            }
+                        }
+                    }
+                    // data[field] = fieldData
+                    data.additionApprover = {
+                        filesURL: filesURL.length > 0 ? filesURL : null,
+                        remark: remark,
+                    };
+                    data.additionApprover[field] = fieldData;
+                }
+                else {
+                    data.additionApprover[field] = fieldData;
+                }
+                //TODO: add condition to Data console.log('',)
+                if (user != null) {
+                    data.newCurrentApprover = {
+                        name: user.fullName,
+                        email: user.email,
+                        empid: user.username,
+                        position: user.position,
+                    };
+                    if (user.level) {
+                        data.newCurrentApprover.level = user.level;
+                    }
+                    if (user.section) {
+                        data.newCurrentApprover.section = user.section;
+                    }
+                    if (user.sub_section) {
+                        data.newCurrentApprover.sub_section = (_p = user.sub_section) !== null && _p !== void 0 ? _p : null;
+                    }
+                    if (user.company) {
+                        data.newCurrentApprover.company = user.company;
+                    }
+                    if (user.department) {
+                        data.newCurrentApprover.department = user.department;
+                    }
+                    // await CustomApi.getMyHierachies(user.username)
+                }
+                // let Datacontext = await this.bpmnServer.engine.get(query);
+                context = yield bpmnServer.engine.invoke(query, data);
+                // instance = context.instance;
+                if (context && context.errors) {
+                    errors = context.errors.toString();
+                }
+                // response.setHeader('Content-Type', 'text/html');
+                response.status(200).json({ success: 'success' });
+            }
+            catch (exc) {
+                errors = exc.toString();
+                console.log(errors);
+                response.status(400).json({ errors: errors });
+            }
+        })));
+        router.post('/engine/resend', upload.array('files'), awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
+            // const data = request
+            // return 
+            const _r = JSON.parse(request.body.data), { task_id, isResend, user, haveFile, remark } = _r, receiveData = __rest(_r, ["task_id", "isResend", "user", "haveFile", "remark"]);
+            const files = request.files;
+            // console.log(406, task_id, isResend, user, haveFile, remark);
+            let filesURL = [];
+            let context;
+            let instance;
+            let errors;
+            // return ;
             try {
                 if (haveFile) {
                     const formData = new FormData();
@@ -360,16 +711,20 @@ class API extends common_1.Common {
                     if (res.status === 200) {
                         if (Array.isArray(res.data)) {
                             res.data.forEach(element => {
-                                fileUrl.push(element.url);
+                                filesURL.push(element.url);
                             });
                         }
                     }
                 }
-                console.log(fileUrl);
-                // let Datacontext = await this.bpmnServer.engine.get(query);
-                // console.log(Datacontext);
-                // context = await bpmnServer.engine.invoke(query, data);
-                // instance = context.instance;
+                let query, data;
+                query =
+                    {
+                        "items.id": task_id
+                    };
+                data = Object.assign({}, receiveData);
+                data['resend'] = isResend !== null && isResend !== void 0 ? isResend : true;
+                data['remark'] = remark;
+                context = yield bpmnServer.engine.invoke(query, data);
                 if (context && context.errors) {
                     errors = context.errors.toString();
                 }
@@ -389,7 +744,6 @@ class API extends common_1.Common {
             }
             else
                 query = request.body;
-            console.log("Query", query);
             let context;
             let instance;
             let errors;
@@ -415,7 +769,7 @@ class API extends common_1.Common {
                 if (request.body.messageMatchingKey)
                     messageMatchingKey = request.body.messageMatchingKey;
                 let context;
-                console.log(data);
+                // console.log(data);
                 context = yield this.bpmnServer.engine.throwMessage(messageId, data, messageMatchingKey);
                 if (context)
                     response.json(context.instance);
@@ -458,8 +812,6 @@ class API extends common_1.Common {
             let name = request.params.name;
             if (!name)
                 name = request.body.name;
-            console.log(' importing: ' + name);
-            console.log('request.body', request.body);
             var fstream;
             try {
                 if (request.busboy) {
@@ -543,7 +895,6 @@ class API extends common_1.Common {
             }
             else
                 query = request.body;
-            console.log(query);
             let errors;
             let result;
             try {

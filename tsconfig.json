@@ -2,15 +2,14 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es6",
-    "lib": [ "es6","dom" ],
+    "lib": ["es6", "dom"],
+    // "target": "es2022",
+    // "lib": ["es2022"],
     "sourceMap": true,
-    "declaration": false
-
+    "declaration": false,
+    "ignoreDeprecations": "5.0",
+    "suppressImplicitAnyIndexErrors": true
   },
-  "include": [
-    "**/*.ts"
-, "custom_api/strapi_api.ts"  ],
-  "exclude": [
-     "node_modules" , "./dist" , "./tools"
-  ]
+  "include": ["**/*.ts", "custom_function/strapi_api.ts", "custom_function/api.ts"],
+  "exclude": ["node_modules", "./dist", "./tools"]
 }
