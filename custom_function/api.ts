@@ -83,7 +83,7 @@ const setDuplicate = async (taskID) => {
 
 
 const getmyTask = async ({ empid, status, startDate, endDate, flowNames }) => {
-    console.log(23, empid, status, startDate, endDate, flowNames);
+    // console.log(23, empid, status, startDate, endDate, flowNames);
     if (!empid) {
         throw new Error("empid is undefine");
 
@@ -134,7 +134,6 @@ const getmyTask = async ({ empid, status, startDate, endDate, flowNames }) => {
         if (Array.isArray(flowNames) && flowNames.length != 0) {
             query["data.flowName"] = { $all: flowNames }
         }
-        console.log('query', query)
         const mongoData = await Tasks.find(query)
         // const mongoData = await Tasks.find(query)
 
@@ -230,7 +229,7 @@ const getAction_logs = async (props) => {
             $gte: startDate,
             $lt: endDate
         },
-        "data.actionLog": { $elemMatch: { empid: username } }
+        "data.actionLog": { $elemMatch: { empid: username, "action": { "$ne": "Submit" } } }
     }
     if (endDate === null) {
         // @ts-ignore
@@ -323,7 +322,7 @@ const hrSetLeave = async (props) => {
     }
 
     const indexLeave = _.findIndex(findTask.data.leaveData, function (o) { return o.dateStr == dateStr });
-    findTask.data.leaveData[indexLeave] = { ...findTask.data.leaveData[indexLeave], value: value, active: active };
+    findTask.data.leaveData[indexLeave] = { ...findTask.data.leaveData[indexLeave], value: parseFloat(value), active: active };
     const newAmount = _.sumBy(findTask.data.leaveData, function (o) {
         if (o.active) {
             return o.value
@@ -411,17 +410,14 @@ const getLeaveQuota = async (data) => {
     }
     const config = {
         method: 'get',
-        maxBodyLength: Infinity,
         url: `${process.env.ESS_URL}/annualleaves?emp_id=${empNoCompany}&company=${company}`,
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        data: data,
         validateStatus: function (status) {
             return status < 500; // Resolve only if the status code is less than 500
         }
     };
-    const res = await axios(config)
+    // console.log('', `${process.env.ESS_URL}/annualleaves?emp_id=${empNoCompany}&company=${company}`)
+    const res = await axios(config).then((d) => console.log('d', d.status)).catch(err => console.log('err', err))
+
     if (res.statusCode !== 200) {
         if (!userInfo.data.status) {
             throw new Error("Annual Leave went wrong")

@@ -8,15 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var axios = require('axios');
-const sendStrapi_email = ({ empid, reason, flowName, linkArrove, linkReject, bcc, }) => __awaiter(this, void 0, void 0, function* () {
-    const data = {
-        empid,
-        reason,
-        flowName,
-        linkArrove,
-        linkReject,
-        bcc,
-    };
+const sendStrapi_email = (props) => __awaiter(this, void 0, void 0, function* () {
+    // const data = {
+    //     empid,
+    //     reason,
+    //     flowName,
+    //     linkArrove,
+    //     linkReject,
+    //     bcc,
+    // };
     const config = {
         method: 'post',
         maxBodyLength: Infinity,
@@ -24,7 +24,7 @@ const sendStrapi_email = ({ empid, reason, flowName, linkArrove, linkReject, bcc
         headers: {
             'Content-Type': 'application/json'
         },
-        data: data,
+        data: props,
         validateStatus: function (status) {
             return status < 500; // Resolve only if the status code is less than 500
         }

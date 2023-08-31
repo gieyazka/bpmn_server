@@ -164,17 +164,17 @@ class API extends common_1.Common {
                     }
                     if ((_h = context.item.element.name) === null || _h === void 0 ? void 0 : _h.includes("send_email_resend")) {
                         if (context.item._status === 'start') {
-                            let emailData = {
-                                "empid": "AH10002500",
-                                "reason": "sick kub",
-                                "data": context.execution.instance.data,
-                                "flowName": "leave_flow",
-                                "linkArrove": `${process.env.Portal_url}/email/${context.item.id}/resend/true`,
-                                "linkReject": `${process.env.Portal_url}/email/${context.item.id}/resend/false`,
-                                // "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
-                                // "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
-                                "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
-                            };
+                            // let emailData = {
+                            //     "empid": "AH10002500",
+                            //     "reason": "sick kub",
+                            //     "data": context.execution.instance.data,
+                            //     "flowName": "leave_flow",
+                            //     "linkArrove": `${process.env.Portal_url}/email/${context.item.id}/resend/true`,
+                            //     "linkReject": `${process.env.Portal_url}/email/${context.item.id}/resend/false`,
+                            //     // "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
+                            //     // "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
+                            //     "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
+                            // }
                             // const resEmail = CustomApi.sendStrapi_email(emailData)
                             // context.execution.instance.data.status = "Waiting"
                         }
@@ -232,7 +232,6 @@ class API extends common_1.Common {
                                 action: action,
                                 remark: context.execution.execution.input.remark,
                             });
-                            console.log('248', logList);
                             context.execution.instance.data.actionLog = logList;
                         }
                     }
@@ -249,9 +248,7 @@ class API extends common_1.Common {
                             else if (levelFlow === 'findHead') {
                                 let level = context.execution.instance.data.requester.level;
                                 let approveList = context.execution.instance.data.approverList;
-                                console.log('approveList', approveList);
                                 if (approveList !== undefined) {
-                                    console.log("last App Level ", approveList[approveList.length - 1].level);
                                     level = approveList[approveList.length - 1].level;
                                     company = approveList[approveList.length - 1].company;
                                     department = approveList[approveList.length - 1].department;
@@ -263,7 +260,6 @@ class API extends common_1.Common {
                                 }
                                 console.table({ company, department, section, level });
                                 res = yield index_2.default.findHead({ company, department, section, level });
-                                console.log('320', res.data);
                             }
                             else {
                                 if (splitArr.length > 2) {
@@ -271,8 +267,6 @@ class API extends common_1.Common {
                                 }
                                 res = yield index_2.default.getEmpPosition({ company, department, section, level: levelFlow });
                             }
-                            // console.log(116, res.data);
-                            // console.log('238', levelFlow)
                             let approverData = { company, department, section, levelFlow };
                             if (res.data.status) {
                                 // send Email
@@ -280,11 +274,11 @@ class API extends common_1.Common {
                                 let approverEmployee = res.data.data.employee;
                                 let approverLevel = res.data.data.level;
                                 approverData = {
-                                    name: approverEmployee.prefix ? approverEmployee.prefix + "." : "" + "" + approverEmployee.firstName + " " + approverEmployee.lastName,
+                                    name: approverEmployee.firstName + " " + approverEmployee.lastName,
                                     email: approverEmployee.email,
                                     arriveTime: dayjs().toDate(),
-                                    // empid: approverEmployee.empid,
-                                    empid: "AH10002500",
+                                    empid: approverEmployee.empid,
+                                    // empid: "AH10002500",
                                     position: approverLevel.position,
                                     priority: approverLevel.priority,
                                     // level: "E2",
@@ -294,8 +288,8 @@ class API extends common_1.Common {
                                 };
                             }
                             let emailData = {
-                                // "empid": approverData.empid,
-                                "empid": "AH10002500",
+                                "empid": approverData.empid,
+                                // "empid": "AH10002500",
                                 "data": context.execution.instance.data,
                                 "from": context.execution.instance.data.requester.name,
                                 "reason": context.execution.instance.data.reason,
@@ -306,7 +300,12 @@ class API extends common_1.Common {
                                 // "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
                                 "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
                             };
-                            const resEmail = index_1.default.sendStrapi_email(emailData);
+                            try {
+                                const resEmail = index_1.default.sendStrapi_email(emailData);
+                            }
+                            catch (error) {
+                                console.log('error 376', error);
+                            }
                             context.execution.instance.data.currentApprover = approverData;
                             context.execution.instance.data.status = "Waiting";
                         }
@@ -355,7 +354,6 @@ class API extends common_1.Common {
                                     return d.type === emp_type;
                                 });
                                 const hrLdap = yield index_1.default.getLDAPDataByEmpID(checkHr.empID);
-                                console.log('hrLdap', hrLdap.data.employee);
                                 const approverData = {
                                     name: hrLdap.data.employee.name,
                                     email: hrLdap.data.employee.email,
@@ -419,14 +417,12 @@ class API extends common_1.Common {
         }));
         bpmnServer.listener = listener;
         router.get('/datastore/findItems', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
             let query;
             if (request.body.query) {
                 query = request.body.query;
             }
             else
                 query = request.body;
-            console.log(query);
             let items;
             let errors;
             try {
@@ -689,7 +685,6 @@ class API extends common_1.Common {
             // return 
             const _r = JSON.parse(request.body.data), { task_id, isResend, user, haveFile, remark } = _r, receiveData = __rest(_r, ["task_id", "isResend", "user", "haveFile", "remark"]);
             const files = request.files;
-            // console.log(406, task_id, isResend, user, haveFile, remark);
             let filesURL = [];
             let context;
             let instance;

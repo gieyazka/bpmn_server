@@ -71,7 +71,7 @@ const setDuplicate = (taskID) => __awaiter(this, void 0, void 0, function* () {
     return updateData;
 });
 const getmyTask = ({ empid, status, startDate, endDate, flowNames }) => __awaiter(this, void 0, void 0, function* () {
-    console.log(23, empid, status, startDate, endDate, flowNames);
+    // console.log(23, empid, status, startDate, endDate, flowNames);
     if (!empid) {
         throw new Error("empid is undefine");
     }
@@ -115,7 +115,6 @@ const getmyTask = ({ empid, status, startDate, endDate, flowNames }) => __awaite
         if (Array.isArray(flowNames) && flowNames.length != 0) {
             query["data.flowName"] = { $all: flowNames };
         }
-        console.log('query', query);
         const mongoData = yield Tasks.find(query);
         // const mongoData = await Tasks.find(query)
         return mongoData;
@@ -194,7 +193,7 @@ const getAction_logs = (props) => __awaiter(this, void 0, void 0, function* () {
             $gte: startDate,
             $lt: endDate
         },
-        "data.actionLog": { $elemMatch: { empid: username } }
+        "data.actionLog": { $elemMatch: { empid: username, "action": { "$ne": "Submit" } } }
     };
     if (endDate === null) {
         // @ts-ignore
@@ -284,7 +283,7 @@ const hrSetLeave = (props) => __awaiter(this, void 0, void 0, function* () {
         "data.leaveData.dateStr": dateStr
     };
     const indexLeave = _.findIndex(findTask.data.leaveData, function (o) { return o.dateStr == dateStr; });
-    findTask.data.leaveData[indexLeave] = Object.assign(Object.assign({}, findTask.data.leaveData[indexLeave]), { value: value, active: active });
+    findTask.data.leaveData[indexLeave] = Object.assign(Object.assign({}, findTask.data.leaveData[indexLeave]), { value: parseFloat(value), active: active });
     const newAmount = _.sumBy(findTask.data.leaveData, function (o) {
         if (o.active) {
             return o.value;
@@ -367,17 +366,13 @@ const getLeaveQuota = (data) => __awaiter(this, void 0, void 0, function* () {
     }
     const config = {
         method: 'get',
-        maxBodyLength: Infinity,
         url: `${process.env.ESS_URL}/annualleaves?emp_id=${empNoCompany}&company=${company}`,
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        data: data,
         validateStatus: function (status) {
             return status < 500; // Resolve only if the status code is less than 500
         }
     };
-    const res = yield axios(config);
+    // console.log('', `${process.env.ESS_URL}/annualleaves?emp_id=${empNoCompany}&company=${company}`)
+    const res = yield axios(config).then((d) => console.log('d', d.status)).catch(err => console.log('err', err));
     if (res.statusCode !== 200) {
         if (!userInfo.data.status) {
             throw new Error("Annual Leave went wrong");

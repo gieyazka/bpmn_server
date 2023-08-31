@@ -1,24 +1,17 @@
 var axios = require('axios');
 
 
-const sendStrapi_email = async ({
-    empid,
-    reason,
-    flowName,
-    linkArrove,
-    linkReject,
-    bcc,
-}) => {
+const sendStrapi_email = async (props) => {
 
-    const data = {
-        empid,
-        reason,
-        flowName,
-        linkArrove,
-        linkReject,
-        bcc,
-    };
-
+    // const data = {
+    //     empid,
+    //     reason,
+    //     flowName,
+    //     linkArrove,
+    //     linkReject,
+    //     bcc,
+    // };
+    
     const config = {
         method: 'post',
         maxBodyLength: Infinity,
@@ -26,7 +19,7 @@ const sendStrapi_email = async ({
         headers: {
             'Content-Type': 'application/json'
         },
-        data: data,
+        data: props,
         validateStatus: function (status) {
             return status < 500; // Resolve only if the status code is less than 500
         }
@@ -137,4 +130,4 @@ const getLDAPDataByEmpID = async (empid) => {
 };
 
 
-module.exports = { sendStrapi_email, getMyHierachies, getEmployee, getUserInfo, getLDAPData , getLDAPDataByEmpID };
+module.exports = { sendStrapi_email, getMyHierachies, getEmployee, getUserInfo, getLDAPData, getLDAPDataByEmpID };

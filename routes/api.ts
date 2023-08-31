@@ -193,18 +193,18 @@ export class API extends Common {
 
                         if (context.item._status === 'start') {
 
-                            let emailData = {
-                                "empid": "AH10002500",
+                            // let emailData = {
+                            //     "empid": "AH10002500",
 
-                                "reason": "sick kub",
-                                "data": context.execution.instance.data,
-                                "flowName": "leave_flow",
-                                "linkArrove": `${process.env.Portal_url}/email/${context.item.id}/resend/true`,
-                                "linkReject": `${process.env.Portal_url}/email/${context.item.id}/resend/false`,
-                                // "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
-                                // "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
-                                "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
-                            }
+                            //     "reason": "sick kub",
+                            //     "data": context.execution.instance.data,
+                            //     "flowName": "leave_flow",
+                            //     "linkArrove": `${process.env.Portal_url}/email/${context.item.id}/resend/true`,
+                            //     "linkReject": `${process.env.Portal_url}/email/${context.item.id}/resend/false`,
+                            //     // "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
+                            //     // "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
+                            //     "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
+                            // }
                             // const resEmail = CustomApi.sendStrapi_email(emailData)
 
                             // context.execution.instance.data.status = "Waiting"
@@ -271,7 +271,7 @@ export class API extends Common {
                                     context.execution.execution.input.remark,
 
                             })
-                            console.log('248', logList)
+                         
 
                             context.execution.instance.data.actionLog = logList
 
@@ -304,9 +304,9 @@ export class API extends Common {
                                 let level = context.execution.instance.data.requester.level
 
                                 let approveList = context.execution.instance.data.approverList
-                                console.log('approveList', approveList)
+                               
                                 if (approveList !== undefined) {
-                                    console.log("last App Level ", approveList[approveList.length - 1].level);
+                               
                                     level = approveList[approveList.length - 1].level
                                     company = approveList[approveList.length - 1].company
                                     department = approveList[approveList.length - 1].department
@@ -318,7 +318,6 @@ export class API extends Common {
                                 }
                                 console.table({ company, department, section, level })
                                 res = await CustomNode.findHead({ company, department, section, level })
-                                console.log('320', res.data)
                             }
                             else {
                                 if (splitArr.length > 2) {
@@ -328,9 +327,7 @@ export class API extends Common {
 
                                 res = await CustomNode.getEmpPosition({ company, department, section, level: levelFlow })
                             }
-                            // console.log(116, res.data);
-
-                            // console.log('238', levelFlow)
+                      
                             let approverData: any = { company, department, section, levelFlow }
 
                             if (res.data.status) {
@@ -339,7 +336,7 @@ export class API extends Common {
                                 let approverEmployee = res.data.data.employee
                                 let approverLevel = res.data.data.level
                                 approverData = {
-                                    name: approverEmployee.prefix ? approverEmployee.prefix + "." : "" + "" + approverEmployee.firstName + " " + approverEmployee.lastName,
+                                    name: approverEmployee.firstName + " " + approverEmployee.lastName,
                                     email: approverEmployee.email,
                                     arriveTime: dayjs().toDate(),
                                     empid: approverEmployee.empid,
@@ -368,8 +365,12 @@ export class API extends Common {
                                 // "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
                                 "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
                             }
+                            try {
 
-                            const resEmail = CustomFn.sendStrapi_email(emailData)
+                                const resEmail = CustomFn.sendStrapi_email(emailData)
+                            } catch (error) {
+                                console.log('error 376',error)
+                            }
 
                             context.execution.instance.data.currentApprover = approverData
                             context.execution.instance.data.status = "Waiting"
@@ -436,7 +437,6 @@ export class API extends Common {
                                     return d.type === emp_type
                                 })
                                 const hrLdap = await CustomFn.getLDAPDataByEmpID(checkHr.empID)
-                                console.log('hrLdap', hrLdap.data.employee)
                                 const approverData = {
                                     name: hrLdap.data.employee.name,
                                     email: hrLdap.data.employee.email,
@@ -527,7 +527,6 @@ export class API extends Common {
         bpmnServer.listener = listener
         router.get('/datastore/findItems', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
-            console.log(request.body);
             let query;
             if (request.body.query) {
                 query = request.body.query;
@@ -535,7 +534,6 @@ export class API extends Common {
             else
                 query = request.body;
 
-            console.log(query);
             let items;
             let errors;
             try {
@@ -835,7 +833,6 @@ export class API extends Common {
             // return 
             const { task_id, isResend, user, haveFile, remark, ...receiveData } = JSON.parse(request.body.data);
             const files = request.files;
-            // console.log(406, task_id, isResend, user, haveFile, remark);
             let filesURL = []
             let context;
             let instance;

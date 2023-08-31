@@ -16,6 +16,7 @@ const router = express.Router();
 var mongoose = require('mongoose');
 const common_1 = require("./common");
 const index_1 = require("../custom_function/index");
+const axios_1 = require("axios");
 const AwaitEventEmitter = require('await-event-emitter').default;
 //const bpmnServer = new BPMNServer(config);
 //const definitions = bpmnServer.definitions;
@@ -81,7 +82,20 @@ class API extends common_1.Common {
             // console.log(200, mongoose.connection.readyState);
             try {
                 let data = request.body;
+                console.log('data', data);
                 const leaveQuota = yield index_1.default.getLeaveQuota(data);
+                response.json(leaveQuota);
+            }
+            catch (exc) {
+                response.json({ error: exc.toString() });
+            }
+        })));
+        router.get('/getLeaveQuota', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
+            // console.log(200, mongoose.connection.readyState);
+            try {
+                let data = request.body;
+                console.log('data', data);
+                const leaveQuota = yield axios_1.default.get('https://ess.aapico.com/annualleaves?emp_id=10002564&company=AH');
                 response.json(leaveQuota);
             }
             catch (exc) {
@@ -194,7 +208,6 @@ class API extends common_1.Common {
                 if (!name)
                     name = request.body.name;
                 let data = request.body.data;
-                console.log('data', data);
                 let userId;
                 let startNodeId, options = {}, userKey;
                 if (request.body.startNodeId) {

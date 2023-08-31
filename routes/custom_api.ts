@@ -10,6 +10,7 @@ import { configuration as config, configuration } from '../configuration';
 import { Common } from './common';
 import CustomApi from '../custom_function/index'
 import CustomNode from '../custom_node/index'
+import axios from 'axios'
 
 const AwaitEventEmitter = require('await-event-emitter').default
 //const bpmnServer = new BPMNServer(config);
@@ -100,9 +101,21 @@ export class API extends Common {
         router.post('/getLeaveQuota', loggedIn, awaitAppDelegateFactory(async (request, response) => {
             // console.log(200, mongoose.connection.readyState);
             try {
-
                 let data = request.body;
+                console.log('data', data)
                 const leaveQuota = await CustomApi.getLeaveQuota(data);
+                response.json(leaveQuota);
+            }
+            catch (exc) {
+                response.json({ error: exc.toString() });
+            }
+        }));
+        router.get('/getLeaveQuota', awaitAppDelegateFactory(async (request, response) => {
+            // console.log(200, mongoose.connection.readyState);
+            try {
+                let data = request.body;
+                console.log('data', data)
+                const leaveQuota = await axios.get('https://ess.aapico.com/annualleaves?emp_id=10002564&company=AH')
                 response.json(leaveQuota);
             }
             catch (exc) {
@@ -235,7 +248,6 @@ export class API extends Common {
                 if (!name)
                     name = request.body.name;
                 let data = request.body.data;
-                console.log('data', data)
                 let userId;
 
                 let startNodeId, options = {}, userKey;
