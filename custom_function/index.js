@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { getLeaveQuota, getHRLeave, checkMongoState, getCurrentApprove, getmyTask, getCurrentApproveTask, getAction_logs, getTaskByItemID, hrCancel, hrSetLeave, setDuplicate, getLeaveDay } = require('./api.ts');
-const { sendStrapi_email, getMyHierachies, getEmployee, getUserInfo, getLDAPData, getLDAPDataByEmpID } = require('./strapi_api.ts');
+const customAPI = require('./api.ts');
+const strapi_api = require('./strapi_api.ts');
 // const { checkMongoState, getCurrentApprove } = require('./api_custom.ts')
-exports.default = {
-    getUserInfo, getHRLeave, getLDAPData, getLDAPDataByEmpID, getLeaveQuota, hrSetLeave,
-    checkMongoState, getCurrentApprove, sendStrapi_email, getmyTask, getCurrentApproveTask, getMyHierachies, getAction_logs, getTaskByItemID, getEmployee, hrCancel, setDuplicate, getLeaveDay
-};
+// export default {
+//     clearLogsTask, getUserInfo, getHRLeave, getLDAPData, getLDAPDataByEmpID, getLeaveQuota, hrSetLeave,
+//     checkMongoState, getCurrentApprove, sendStrapi_email, getmyTask, getLeave, getCurrentApproveTask, getMyHierachies, getAction_logs, getTaskByItemID, getEmployee, hrCancel, setDuplicate, getLeaveDay, updateLeaveFile
+// }
+exports.default = Object.assign(Object.assign({}, customAPI), strapi_api);
 //# sourceMappingURL=index.js.map

@@ -8,31 +8,34 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var axios = require('axios');
-const checkBoolLevel = ({ condition, empid, level, }) => __awaiter(this, void 0, void 0, function* () {
-    const checMyLevel = yield axios.post(`${process.env.Strapi_URL}/api/hierachies/checkConditionLevel`, {
-        condition, empid, level
+const checkBoolLevel = ({ condition, empid, level, company, department }) => __awaiter(this, void 0, void 0, function* () {
+    console.table({ condition, empid, level, company, department });
+    const checkMyLevel = yield axios.post(`${process.env.Strapi_URL}/api/hierachies/checkConditionLevel`, {
+        condition, empid, control_level: level, company, department
     });
-    return checMyLevel;
+    return checkMyLevel;
 });
-const getEmpPosition = ({ company, department, section, level }) => __awaiter(this, void 0, void 0, function* () {
+const getEmpPosition = ({ company, department, section, sub_section, level }) => __awaiter(this, void 0, void 0, function* () {
     const getEmpByLevel = yield axios.post(`${process.env.Strapi_URL}/api/orgs/searchOrg`, {
         company,
         department,
         section,
-        level
+        sub_section,
+        control_level: level
     }).catch(err => console.log(err));
     return getEmpByLevel;
 });
-const getHead = ({ empid }) => __awaiter(this, void 0, void 0, function* () {
+const getHead = ({ empid, company, department }) => __awaiter(this, void 0, void 0, function* () {
     const getEmpByLevel = yield axios.post(`${process.env.Strapi_URL}/api/orgs/getHead`, {
-        empid
+        empid, company, department
     }).catch(err => console.log(err));
     return getEmpByLevel;
 });
 const findHead = ({ company, department, section, level }) => __awaiter(this, void 0, void 0, function* () {
+    console.log('find Head', company, department, section, level);
     const getEmpByLevel = yield axios.post(`${process.env.Strapi_URL}/api/orgs/findHead`, {
-        company, department, section, level
-    }).catch(err => console.log(err));
+        company, department, section, control_level: level
+    }).catch(err => err);
     return getEmpByLevel;
 });
 module.exports = { checkBoolLevel, getEmpPosition, getHead, findHead };

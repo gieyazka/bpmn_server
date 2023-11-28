@@ -128,6 +128,27 @@ const getLDAPDataByEmpID = async (empid) => {
     const res = await axios(config)
     return res;
 };
+const getEmpByEmpID = async (empid) => {
+
+    const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `${process.env.Strapi_URL}/api/users/getUserByEmpId`,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: {
+            empid
+        },
+        validateStatus: function (status) {
+            return status < 500; // Resolve only if the status code is less than 500
+        }
+    };
 
 
-module.exports = { sendStrapi_email, getMyHierachies, getEmployee, getUserInfo, getLDAPData, getLDAPDataByEmpID };
+    const res = await axios(config)
+    return res;
+};
+
+
+module.exports = { sendStrapi_email, getMyHierachies, getEmployee, getUserInfo, getLDAPData, getLDAPDataByEmpID ,getEmpByEmpID};

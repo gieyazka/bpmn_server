@@ -29,6 +29,7 @@ const upload = multer();
 var FormData = require('form-data');
 //import { ExecuteDecisionTable, ExecuteCondition, ExecuteExpression } from 'dmn-engine';
 var mongoose = require('mongoose');
+const _ = require('lodash');
 const __1 = require("..");
 const configuration_1 = require("../configuration");
 const common_1 = require("./common");
@@ -69,32 +70,43 @@ class API extends common_1.Common {
         var router = express.Router();
         // var bpmnServer = this.bpmnServer;
         const logger = new __1.Logger({
-            toConsole: false
+            toConsole: false,
+            // callback: (logDAta) => {
+            //     console.log('70logDAta', logDAta)
+            // }
         });
         const bpmnServer = new __1.BPMNServer(configuration_1.configuration, logger, { cron: false, noWait: false });
         const listener = new AwaitEventEmitter();
         listener.on('all', ({ context, event }) => __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
             try {
                 // console.log(174, context.item?.element.name);
                 if (context.item) {
                     // console.log(176, context.item._status, "||", context.item.element.name, context.item.element?.name === "End", context.item.element.id);
                     if ((_a = context.item.element.name) === null || _a === void 0 ? void 0 : _a.includes("start_flow")) {
                         if (context.item._status === 'start') {
+                            const nanoid = (0, nanoid_1.customAlphabet)('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 2);
+                            context.execution.instance.task_id = `EF-${dayjs().format('YYMMDDmmss')}-${nanoid()}`;
+                            if (context.execution.instance.data.createdAt !== dayjs().format('YYYYMMDD') && context.execution.instance.data.refID === undefined) {
+                                throw new Error("Issue Date invalid");
+                            }
+                            else {
+                                context.execution.instance.createdAt = context.execution.instance.data.createdAt;
+                                delete context.execution.instance.data.createdAt;
+                            }
+                            // context.execution.instance.createdAt = context.execution.instance.data.createdAt
                             if (context.execution.instance.data.requester !== undefined) {
                                 if (context.execution.instance.data.requester.name === undefined) {
                                     //TODO : get name
-                                    // console.log(84);
-                                    const nanoid = (0, nanoid_1.customAlphabet)('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 2);
-                                    context.execution.instance.task_id = `EF-${dayjs().format('YYMMDDmmss')}-${nanoid()}`;
-                                    context.execution.instance.createdAt = dayjs().format('YYYYMMDD');
                                     const employee = yield index_1.default.getUserInfo(context.execution.instance.data.requester.empid);
-                                    console.log('90', employee.data);
+                                    const getEmail = yield index_1.default.getEmpByEmpID(context.execution.instance.data.requester.empid);
                                     if (employee.data.status === true) {
                                         const empData = employee.data.employee;
                                         context.execution.instance.data.requester.name = empData.name_en;
                                         context.execution.instance.data.requester.name_th = (empData.title ? empData.title : "") + empData.name_th + " " + empData.surname_th;
-                                        context.execution.instance.data.requester.email = (_b = empData.email) !== null && _b !== void 0 ? _b : null;
+                                        context.execution.instance.data.requester.email = (_b = getEmail.data.employee) === null || _b === void 0 ? void 0 : _b.email;
+                                        context.execution.instance.data.requester.departmentPayroll = empData.department;
+                                        context.execution.instance.data.requester.position = empData.position_th;
                                     }
                                     else {
                                         throw new Error("No employee id");
@@ -112,8 +124,8 @@ class API extends common_1.Common {
                                 level: requester.level,
                                 section: requester.section,
                                 sub_section: requester.sub_section,
-                                company: requester.company,
-                                department: requester.department,
+                                company: requester.companyPayroll,
+                                department: requester.departmentPayroll,
                                 filesURL: null,
                                 date: dayjs().toDate(),
                                 action: "Submit",
@@ -123,6 +135,8 @@ class API extends common_1.Common {
                             if (refID) {
                                 submitActionLog.remark = `from Task_ID : ${refID}`;
                                 context.execution.instance.issueDate = dayjs(context.execution.instance.data.issueDate).toDate();
+                                context.execution.instance.createdAt = dayjs(context.execution.instance.data.issueDate).format('YYYYMMDD');
+                                context.execution.instance.startedAt = dayjs(context.execution.instance.data.issueDate).toDate();
                                 context.execution.instance.data.newTaskID = context.execution.instance.task_id;
                                 delete context.execution.instance.data.issueDate;
                                 yield index_1.default.setDuplicate(context.execution.instance.data.refID);
@@ -142,7 +156,7 @@ class API extends common_1.Common {
                             const [name, condition, level] = context.item.element.name.split(":");
                             //TODO: add company for check if need
                             const { empid, company, department, section } = context.execution.instance.data.requester;
-                            const res = yield index_2.default.checkBoolLevel({ empid, condition, level, });
+                            const res = yield index_2.default.checkBoolLevel({ empid, condition, level, company, department });
                             context.item.token.execution.output = { checkStatus: (_e = res.data.status) !== null && _e !== void 0 ? _e : false };
                             // console.log(context.item);
                         }
@@ -151,26 +165,32 @@ class API extends common_1.Common {
                         if (context.item._status === 'start') {
                             const splitArr = context.item.element.name.split(":");
                             const [name, level] = splitArr;
-                            let { company, department, section } = context.execution.instance.data.requester;
+                            let { company, department, section, sub_section } = context.execution.instance.data.requester;
                             if (splitArr.length > 2) {
                                 [company, department, section] = splitArr.slice(2);
                             }
-                            console.table({ company, department, section, level });
-                            const res = yield index_2.default.getEmpPosition({ company, department, section, level });
-                            console.log('res', res.data);
+                            // console.table({ company, department, section, level })
+                            const res = yield index_2.default.getEmpPosition({ company, department, section, sub_section, level });
                             // throw new Error("test");
-                            context.item.token.execution.output = { checkStatus: res.data.status, positionData: (_g = res.data.data) === null || _g === void 0 ? void 0 : _g.employee };
+                            let checkStatus = res.data.status;
+                            if (res.data.status) {
+                                if (((_g = res.data.data) === null || _g === void 0 ? void 0 : _g.employee) === null) {
+                                    checkStatus = false;
+                                }
+                            }
+                            context.item.token.execution.output = { checkStatus: checkStatus, positionData: (_h = res.data.data) === null || _h === void 0 ? void 0 : _h.employee };
                         }
                     }
-                    if ((_h = context.item.element.name) === null || _h === void 0 ? void 0 : _h.includes("send_email_resend")) {
+                    if ((_j = context.item.element.name) === null || _j === void 0 ? void 0 : _j.includes("send_email_resend")) {
+                        // throw new Error("Test Error");
                         if (context.item._status === 'start') {
                             // let emailData = {
                             //     "empid": "AH10002500",
                             //     "reason": "sick kub",
                             //     "data": context.execution.instance.data,
                             //     "flowName": "leave_flow",
-                            //     "linkArrove": `${process.env.Portal_url}/email/${context.item.id}/resend/true`,
-                            //     "linkReject": `${process.env.Portal_url}/email/${context.item.id}/resend/false`,
+                            //     "linkArrove": `${process.env.Portal_url_external}/email/${context.item.id}/resend/true`,
+                            //     "linkReject": `${process.env.Portal_url_external}/email/${context.item.id}/resend/false`,
                             //     // "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
                             //     // "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
                             //     "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
@@ -189,11 +209,14 @@ class API extends common_1.Common {
                             if (context.execution.instance.data.requester !== undefined) {
                                 if (context.execution.instance.data.requester.name === undefined) {
                                     const employee = yield index_1.default.getUserInfo(context.execution.instance.data.requester.empid);
+                                    const getEmail = yield index_1.default.getEmpByEmpID(context.execution.instance.data.requester.empid);
                                     if (employee.data.status === true) {
                                         const empData = employee.data.employee;
                                         context.execution.instance.data.requester.name = empData.name_en;
                                         context.execution.instance.data.requester.name_th = (empData.title ? empData.title : "") + empData.name_th + " " + empData.surname_th;
-                                        context.execution.instance.data.requester.email = (_j = empData.email) !== null && _j !== void 0 ? _j : null;
+                                        context.execution.instance.data.requester.email = (_k = getEmail.data.employee) === null || _k === void 0 ? void 0 : _k.email;
+                                        context.execution.instance.data.requester.departmentPayroll = empData.department;
+                                        context.execution.instance.data.requester.position = empData.position_th;
                                     }
                                     else {
                                         throw new Error("No employee id");
@@ -207,7 +230,7 @@ class API extends common_1.Common {
                             let action = "Resubmit";
                             if (context.execution.execution.input.resend === false) {
                                 context.execution.instance.data.status = "Cancel";
-                                action = "Cancle";
+                                action = "Cancel";
                             }
                             let logList = context.execution.instance.data.actionLog
                                 || [];
@@ -235,15 +258,15 @@ class API extends common_1.Common {
                             context.execution.instance.data.actionLog = logList;
                         }
                     }
-                    if ((_k = context.item.element.name) === null || _k === void 0 ? void 0 : _k.includes("send_email_approve")) {
+                    if ((_l = context.item.element.name) === null || _l === void 0 ? void 0 : _l.includes("send_email_approve")) {
                         if (context.item._status === 'start') {
                             const splitArr = context.item.element.name.split(":");
                             const [name, levelFlow] = splitArr;
-                            let { empid, company, department, section } = context.execution.instance.data.requester;
+                            let { empid, company, department, section, sub_section } = context.execution.instance.data.requester;
                             let res;
                             if (levelFlow === 'head') {
                                 ///get Head
-                                res = yield index_2.default.getHead({ empid });
+                                res = yield index_2.default.getHead({ empid, company, department });
                             }
                             else if (levelFlow === 'findHead') {
                                 let level = context.execution.instance.data.requester.level;
@@ -254,35 +277,45 @@ class API extends common_1.Common {
                                     department = approveList[approveList.length - 1].department;
                                     section = approveList[approveList.length - 1].section;
                                 }
-                                console.table({ company, department, section, level });
                                 if (!level) {
-                                    level = "M4";
+                                    level = "M2";
                                 }
-                                console.table({ company, department, section, level });
+                                console.table({ fn: "findHead", company, department, section, level });
                                 res = yield index_2.default.findHead({ company, department, section, level });
+                                console.log('res FindHead', res.data);
+                                if (res.data.status === false) {
+                                    throw Error("Cannot found head");
+                                }
                             }
                             else {
                                 if (splitArr.length > 2) {
                                     [company, department, section] = splitArr.slice(2);
                                 }
-                                res = yield index_2.default.getEmpPosition({ company, department, section, level: levelFlow });
+                                console.log('in send email approve');
+                                console.table({ company, department, section, level: levelFlow });
+                                res = yield index_2.default.getEmpPosition({ company, department, section, sub_section, level: levelFlow });
                             }
+                            // console.log('res', res.data)
                             let approverData = { company, department, section, levelFlow };
+                            // console.log('344', res.data.data)
                             if (res.data.status) {
                                 // send Email
                                 let approverSection = res.data.data.section;
                                 let approverEmployee = res.data.data.employee;
                                 let approverLevel = res.data.data.level;
+                                let approverControlLevel = res.data.data.control_level;
                                 approverData = {
-                                    name: approverEmployee.firstName + " " + approverEmployee.lastName,
-                                    email: approverEmployee.email,
+                                    name: (approverEmployee.prefix ? approverEmployee.prefix + "." : "") + approverEmployee.firstName + " " + approverEmployee.lastName,
+                                    email: approverEmployee.email.toLowerCase(),
+                                    // email: "pokkate.e@aapico.com",
                                     arriveTime: dayjs().toDate(),
                                     empid: approverEmployee.empid,
                                     // empid: "AH10002500",
                                     position: approverLevel.position,
                                     priority: approverLevel.priority,
                                     // level: "E2",
-                                    level: approverLevel.level,
+                                    realLevel: approverLevel.level,
+                                    level: approverControlLevel.level,
                                     section: approverSection ? approverSection.name : null,
                                     company, department,
                                 };
@@ -294,79 +327,146 @@ class API extends common_1.Common {
                                 "from": context.execution.instance.data.requester.name,
                                 "reason": context.execution.instance.data.reason,
                                 "flowName": context.execution.instance.data.flowName,
-                                "linkArrove": `${process.env.Portal_url}/email/${context.item.id}/approved/true`,
-                                "linkReject": `${process.env.Portal_url}/email/${context.item.id}/approved/false`,
+                                "linkArrove": `${process.env.Portal_url_external}/email/${context.item.id}/approved/true/${approverData.email}`,
+                                "linkReject": `${process.env.Portal_url_external}/email/${context.item.id}/approved/false/${approverData.email}`,
                                 // "linkArrove": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/true`,
                                 // "linkReject": `${process.env.WorkFlow_URL}/api/engine/invoke/${context.item.id}/approved/false`,
-                                "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com"]
+                                "bcc": ["pokkate.e@aapico.com", "sawanon.w@aapico.com", "thanaporn.s@aapico.com"]
                             };
                             try {
+                                console.log('emailData', emailData.empid);
                                 const resEmail = index_1.default.sendStrapi_email(emailData);
                             }
                             catch (error) {
                                 console.log('error 376', error);
                             }
-                            context.execution.instance.data.currentApprover = approverData;
+                            // console.log('approverData', approverData)
+                            context.execution.instance.data.currentApprover = [approverData]; // to Array
                             context.execution.instance.data.status = "Waiting";
                         }
                         if (context.item._status === 'end') {
                             //onEmail Action
-                            const isApprove = context.execution.execution.input.additionApprover.approved;
+                            const additionApprover = context.execution.execution.input.additionApprover;
+                            const { email } = additionApprover;
+                            let findApprover = undefined;
+                            if (email) {
+                                if (_.isArray(context.execution.instance.data.currentApprover)) {
+                                    findApprover = context.execution.instance.data.currentApprover.find(d => d.email === email);
+                                    if (!findApprover) {
+                                        throw "in valid email";
+                                    }
+                                }
+                            }
+                            const isApprove = additionApprover.approved;
                             let appList = context.execution.instance.data.approverList
                                 || [];
                             let logList = context.execution.instance.data.actionLog
                                 || [];
-                            let newApprover = Object.assign(Object.assign(Object.assign({}, context.execution.instance.data.currentApprover), context.execution.instance.data.newCurrentApprover), { date: dayjs().toISOString(), action: context.execution.instance.data.additionApprover.approved ? "Approved" : "Rejected" });
+                            const oldCurApprover = email ? {} : context.execution.instance.data.currentApprover;
+                            let newApprover = Object.assign(Object.assign(Object.assign({}, oldCurApprover), context.execution.instance.data.newCurrentApprover), { date: dayjs().toISOString(), action: isApprove ? "Approved" : "Rejected" });
+                            if (findApprover) {
+                                newApprover = Object.assign(Object.assign({}, newApprover), findApprover);
+                            }
                             if (context.execution.instance.data.additionApprover !== undefined) {
                                 context.item.token.execution.output = { checkStatus: isApprove };
-                                newApprover = Object.assign(Object.assign({}, newApprover), context.execution.instance.data.additionApprover);
+                                delete additionApprover.email;
+                                newApprover = Object.assign(Object.assign({}, newApprover), additionApprover);
+                            }
+                            if (newApprover["0"] && email) {
+                                delete newApprover["0"];
                             }
                             logList.push(newApprover);
                             appList.push(newApprover);
                             context.execution.instance.data.actionLog = logList;
                             context.execution.instance.data.approverList
                                 = appList;
+                            // console.log('406', context.item.token.execution.output)
                             context.execution.instance.data.currentApprover = null;
                             context.execution.instance.data.status = isApprove ? "Waiting" : "Rejected";
+                            // delete context.execution.execution.input.additionApprover
                             delete context.execution.instance.data.newCurrentApprover;
                             delete context.execution.instance.data.approved;
                             delete context.execution.instance.data.additionApprover;
-                            // console.log( context.item);
+                            console.log('end send_email approve');
                         }
                     }
-                    if ((_l = context.item.element.name) === null || _l === void 0 ? void 0 : _l.includes("send_approve")) {
+                    if ((_m = context.item.element.name) === null || _m === void 0 ? void 0 : _m.includes("send_approve")) {
                         if (context.item._status === 'start') {
                             const splitArr = context.item.element.name.split(":");
                             const [name, levelFlow] = splitArr;
                             const userInfo = yield index_1.default.getUserInfo(context.execution.instance.data.requester.empid);
                             if (userInfo.data.status) {
                                 let { company, emp_type } = userInfo.data.employee;
-                                if (emp_type === "Daily" || emp_type === "Monthly") {
-                                }
-                                else {
-                                    company = "Sub_Contract";
-                                }
+                                // if (emp_type === "Daily" || emp_type === "Monthly") {
+                                // } else {
+                                //     company = "Sub_Contract"
+                                // }
+                                // emp_type = "Monthly" //TODO: For Test
+                                // company = "AERP" //TODO: For Test
+                                console.table({ company, emp_type });
                                 const getHrLeave = yield index_1.default.getHRLeave(company, emp_type);
                                 if (!getHrLeave) {
-                                    throw new Error("NO Hr leave Conditions");
+                                    throw new Error("No Hr leave Conditions");
                                 }
                                 const checkHr = getHrLeave.responsible.find(d => {
-                                    return d.type === emp_type;
+                                    return d.type === emp_type; //TODO: may be check company too
                                 });
-                                const hrLdap = yield index_1.default.getLDAPDataByEmpID(checkHr.empID);
-                                const approverData = {
-                                    name: hrLdap.data.employee.name,
-                                    email: hrLdap.data.employee.email,
-                                    arriveTime: dayjs().toDate(),
-                                    empid: checkHr.empID,
-                                    // empid: "AH10002500",
-                                    // position: approverLevel.position,
-                                    // priority: approverLevel.priority,
-                                    // level: "E2",
-                                    // level: approverLevel.level,
-                                    section: null,
-                                    company: hrLdap.data.employee.company, department: hrLdap.data.employee.department,
-                                };
+                                if (!checkHr) {
+                                    throw new Error("No Hr leave Conditions");
+                                }
+                                const approverData = [];
+                                if (_.isArray(checkHr.empID)) {
+                                    for (let index = 0; index < checkHr.empID.length; index++) {
+                                        const hrEmpID = checkHr.empID[index];
+                                        const email = checkHr.email[index];
+                                        // const hrEmpID = checkHr.name[index];
+                                        const hrLdap = yield index_1.default.getLDAPDataByEmpID(hrEmpID);
+                                        console.log('hrLdap', hrLdap.data);
+                                        const hrOrg = yield index_1.default.getEmpByEmpID(hrEmpID);
+                                        if (hrLdap.data.employee === undefined || hrOrg.data.employee === undefined) {
+                                            throw new Error(`No setting  type : ${emp_type} with company : ${company} `);
+                                        }
+                                        approverData.push({
+                                            name: hrOrg.data.employee.prefix + "." + hrOrg.data.employee.firstName + " " + hrOrg.data.employee.lastName,
+                                            email: hrOrg.data.employee.email.toLowerCase(),
+                                            arriveTime: dayjs().toDate(),
+                                            empid: hrEmpID,
+                                            // empid: "AH10002500",
+                                            // position: approverLevel.position,
+                                            // priority: approverLevel.priority,
+                                            // level: "E2",
+                                            // level: approverLevel.level,
+                                            section: null,
+                                            company: hrLdap.data.employee.company, department: hrLdap.data.employee.department,
+                                        });
+                                    }
+                                }
+                                else {
+                                    const hrEmpID = checkHr.empID;
+                                    const email = checkHr.email;
+                                    // const hrEmpID = checkHr.name[index];
+                                    const hrLdap = yield index_1.default.getLDAPDataByEmpID(hrEmpID);
+                                    console.table(Object.assign({ api: "Hr Ldap" }, hrLdap.data.employee));
+                                    const hrOrg = yield index_1.default.getEmpByEmpID(hrEmpID);
+                                    console.table(Object.assign({ api: "Hr org" }, hrOrg.data.employee));
+                                    if (hrLdap.data.employee === undefined || hrOrg.data.employee === undefined) {
+                                        throw new Error(`No setting  type : ${emp_type} with company : ${company} `);
+                                    }
+                                    approverData.push({
+                                        name: hrOrg.data.employee.prefix + "." + hrOrg.data.employee.firstName + " " + hrOrg.data.employee.lastName,
+                                        email: hrOrg.data.employee.email.toLowerCase(),
+                                        arriveTime: dayjs().toDate(),
+                                        empid: hrEmpID,
+                                        // empid: "AH10002500",
+                                        // position: approverLevel.position,
+                                        // priority: approverLevel.priority,
+                                        // level: "E2",
+                                        // level: approverLevel.level,
+                                        section: null,
+                                        company: hrLdap.data.employee.company, department: hrLdap.data.employee.department,
+                                    });
+                                }
+                                console.log('approverData', approverData);
                                 context.execution.instance.data.currentApprover = approverData;
                                 context.execution.instance.data.status = "Waiting";
                             }
@@ -374,12 +474,13 @@ class API extends common_1.Common {
                         }
                         if (context.item._status === 'end') {
                             //onEmail Action
+                            console.log('context.execution.execution.input', context.execution.execution.input);
                             const isApprove = context.execution.execution.input.additionApprover.approved;
                             let appList = context.execution.instance.data.approverList
                                 || [];
                             let logList = context.execution.instance.data.actionLog
                                 || [];
-                            let newApprover = Object.assign(Object.assign(Object.assign({}, context.execution.instance.data.currentApprover), context.execution.instance.data.newCurrentApprover), { date: dayjs().toISOString(), action: context.execution.instance.data.additionApprover.approved ? "Approved" : "Rejected" });
+                            let newApprover = Object.assign(Object.assign(Object.assign({}, context.execution.instance.data.currentApprover), context.execution.instance.data.newCurrentApprover), { date: dayjs().toISOString(), action: isApprove ? "Approved" : "Rejected" });
                             if (context.execution.instance.data.additionApprover !== undefined) {
                                 context.item.token.execution.output = { checkStatus: isApprove };
                                 newApprover = Object.assign(Object.assign({}, newApprover), context.execution.instance.data.additionApprover);
@@ -397,9 +498,10 @@ class API extends common_1.Common {
                             // console.log( context.item);
                         }
                     }
-                    if ((_o = (_m = context.item.element) === null || _m === void 0 ? void 0 : _m.name) === null || _o === void 0 ? void 0 : _o.includes("end_flow")) {
+                    if ((_p = (_o = context.item.element) === null || _o === void 0 ? void 0 : _o.name) === null || _p === void 0 ? void 0 : _p.includes("end_flow")) {
+                        // throw new Error("test Hr");
                         if (context.item._status === 'end') {
-                            if (context.execution.instance.data.status !== "Rejected") {
+                            if (context.execution.instance.data.status === "Waiting") {
                                 context.execution.instance.data.status = "Success";
                             }
                         }
@@ -412,10 +514,11 @@ class API extends common_1.Common {
                 context.execution.instance.data.lastUpdate = dayjs().toISOString();
             }
             catch (error) {
-                throw new Error(error);
+                throw error;
             }
         }));
         bpmnServer.listener = listener;
+        // console.log(bpmnServer.engine)
         router.get('/datastore/findItems', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
             let query;
             if (request.body.query) {
@@ -470,14 +573,13 @@ class API extends common_1.Common {
             }
         })));
         router.post('/engine/start/:name?', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
+            var _q, _r;
             // console.log(200, mongoose.connection.readyState);
             try {
                 let name = request.params.name;
                 if (!name)
                     name = request.body.name;
-                console.log(' starting ' + name);
                 let data = request.body.data;
-                console.log(430, name, data);
                 let userId;
                 let startNodeId, options = {}, userKey;
                 if (request.body.startNodeId) {
@@ -494,12 +596,16 @@ class API extends common_1.Common {
                 let context;
                 try {
                     context = yield bpmnServer.engine.start(name, data, null).then(res => res).catch(err => {
+                        console.log('err', err.stack);
                         return ({ status: 400, err: err.message });
                     });
                     if (context.status === 400) {
                         response.status(400).json(context);
                     }
                     else {
+                        if (context && context.execution) {
+                            yield index_1.default.clearLogsTask((_r = (_q = context.execution) === null || _q === void 0 ? void 0 : _q.instance) === null || _r === void 0 ? void 0 : _r.task_id);
+                        }
                         response.json(context.instance);
                     }
                 }
@@ -514,39 +620,6 @@ class API extends common_1.Common {
             catch (exc) {
                 response.json({ error: exc.toString() });
             }
-        })));
-        router.put('/engine/invoke', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
-            let query, data, userId, options, userKey;
-            if (request.body.query) {
-                query = request.body.query;
-            }
-            if (request.body.data) {
-                data = request.body.data;
-            }
-            if (request.body.options) {
-                options = request.body.options;
-            }
-            if (request.body.userId) {
-                userId = request.body.userId;
-            }
-            let workId = request.body.id;
-            let context;
-            let instance;
-            let errors;
-            console.log(workId, data);
-            try {
-                userKey = this.bpmnServer.iam.getRemoteUser(userId);
-                context = yield bpmnServer.engine.invoke({ id: workId, "items.name": 'send_email:M4' }, { testInvoke: true }, userKey, options);
-                instance = context.instance;
-                if (context && context.errors)
-                    errors = context.errors.toString();
-            }
-            catch (exc) {
-                errors = exc.toString();
-                console.log(errors);
-            }
-            response.json({ errors: errors, instance });
         })));
         router.get('/engine/invoke/:id/:field/:value', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
             let params = request.params;
@@ -568,7 +641,6 @@ class API extends common_1.Common {
             data = {
                 [params.field]: value
             };
-            console.log("query----", query, data);
             let context;
             let instance;
             let errors;
@@ -587,16 +659,15 @@ class API extends common_1.Common {
             response.json({ errors: errors, instance });
         })));
         router.post('/engine/invoke', upload.array('files'), awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
-            var _p;
+            var _s;
             // const data = request
-            console.log(request.body);
             // return 
-            const _q = JSON.parse(request.body.data), { task_id, field, fieldData, user, haveFile, remark } = _q, receiveData = __rest(_q, ["task_id", "field", "fieldData", "user", "haveFile", "remark"]);
+            const _t = JSON.parse(request.body.data), { task_id, email, field, fieldData, user, haveFile, remark } = _t, receiveData = __rest(_t, ["task_id", "email", "field", "fieldData", "user", "haveFile", "remark"]);
             if (!task_id) {
                 response.status(404).json({ error: "invalid task_id" });
             }
             const files = request.files;
-            console.log(406, task_id, field, fieldData, user, haveFile, remark);
+            // console.log(406, task_id, field, fieldData, user, haveFile, remark);
             let filesURL = [];
             let context;
             let instance;
@@ -632,6 +703,7 @@ class API extends common_1.Common {
                     }
                     // data[field] = fieldData
                     data.additionApprover = {
+                        email: email,
                         filesURL: filesURL.length > 0 ? filesURL : null,
                         remark: remark,
                     };
@@ -640,6 +712,7 @@ class API extends common_1.Common {
                 else {
                     data.additionApprover[field] = fieldData;
                 }
+                console.log('user', user);
                 //TODO: add condition to Data console.log('',)
                 if (user != null) {
                     data.newCurrentApprover = {
@@ -648,14 +721,14 @@ class API extends common_1.Common {
                         empid: user.username,
                         position: user.position,
                     };
-                    if (user.level) {
-                        data.newCurrentApprover.level = user.level;
-                    }
+                    // if (user.level) {
+                    //     data.newCurrentApprover.level = user.level
+                    // }
                     if (user.section) {
                         data.newCurrentApprover.section = user.section;
                     }
                     if (user.sub_section) {
-                        data.newCurrentApprover.sub_section = (_p = user.sub_section) !== null && _p !== void 0 ? _p : null;
+                        data.newCurrentApprover.sub_section = (_s = user.sub_section) !== null && _s !== void 0 ? _s : null;
                     }
                     if (user.company) {
                         data.newCurrentApprover.company = user.company;
@@ -666,12 +739,20 @@ class API extends common_1.Common {
                     // await CustomApi.getMyHierachies(user.username)
                 }
                 // let Datacontext = await this.bpmnServer.engine.get(query);
+                // console.log('data813', data)
+                setTimeout(() => __awaiter(this, void 0, void 0, function* () {
+                    var _u, _v;
+                    if (context && context.errors) {
+                        errors = context.errors.toString();
+                    }
+                    // response.setHeader('Content-Type', 'text/html');
+                    if (context && context.execution) {
+                        yield index_1.default.clearLogsTask((_v = (_u = context.execution) === null || _u === void 0 ? void 0 : _u.instance) === null || _v === void 0 ? void 0 : _v.task_id);
+                    }
+                }), 500);
+                // throw "error"
                 context = yield bpmnServer.engine.invoke(query, data);
                 // instance = context.instance;
-                if (context && context.errors) {
-                    errors = context.errors.toString();
-                }
-                // response.setHeader('Content-Type', 'text/html');
                 response.status(200).json({ success: 'success' });
             }
             catch (exc) {
@@ -681,9 +762,10 @@ class API extends common_1.Common {
             }
         })));
         router.post('/engine/resend', upload.array('files'), awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
+            var _w, _x;
             // const data = request
             // return 
-            const _r = JSON.parse(request.body.data), { task_id, isResend, user, haveFile, remark } = _r, receiveData = __rest(_r, ["task_id", "isResend", "user", "haveFile", "remark"]);
+            const _y = JSON.parse(request.body.data), { task_id, isResend, user, haveFile, remark } = _y, receiveData = __rest(_y, ["task_id", "isResend", "user", "haveFile", "remark"]);
             const files = request.files;
             let filesURL = [];
             let context;
@@ -724,6 +806,9 @@ class API extends common_1.Common {
                     errors = context.errors.toString();
                 }
                 // response.setHeader('Content-Type', 'text/html');
+                if (context && context.execution) {
+                    yield index_1.default.clearLogsTask((_x = (_w = context.execution) === null || _w === void 0 ? void 0 : _w.instance) === null || _x === void 0 ? void 0 : _x.task_id);
+                }
                 response.status(200).json({ success: 'success' });
             }
             catch (exc) {
@@ -881,6 +966,18 @@ class API extends common_1.Common {
                 let name = request.params.name;
                 let definition = yield bpmnServer.definitions.load(name);
                 response.json(JSON.parse(definition.getJson()));
+            });
+        });
+        router.get('/source/load/:name?', loggedIn, function (request, response) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let name = request.params.name;
+                let definition = yield bpmnServer.definitions.load(name);
+                const data = {
+                    items: definition.getJson(),
+                    name: definition.name,
+                    source: definition.source
+                };
+                response.json(data);
             });
         });
         router.delete('/datastore/deleteInstances', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
