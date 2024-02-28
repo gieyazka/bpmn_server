@@ -1,4 +1,4 @@
-const axios = require('axios');
+var axios = require('axios');
 import express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -6,6 +6,7 @@ const upload = multer();
 var FormData = require('form-data');
 //import { ExecuteDecisionTable, ExecuteCondition, ExecuteExpression } from 'dmn-engine';
 var mongoose = require('mongoose');
+const EventEmitter = require('node:events');
 const _ = require('lodash')
 import FS = require('fs');
 
@@ -15,13 +16,19 @@ import { configuration as config, configuration } from '../configuration';
 import { Common } from './common';
 import CustomFn from '../custom_function/index'
 import CustomNode from '../custom_node/index'
+import EleaveFn from '../Eleave_function/index'
 import { customAlphabet } from 'nanoid'
 
 const dayjs = require('dayjs')
-const AwaitEventEmitter = require('await-event-emitter').default
-//const bpmnServer = new BPMNServer(config);
 
-//const definitions = bpmnServer.definitions;
+var utc = require('dayjs/plugin/utc')
+var timezone = require('dayjs/plugin/timezone')
+// dayjs.extend(utc)
+// dayjs.extend(timezone)
+
+// dayjs.tz.setDefault("Asia/Bangkok")
+const AwaitEventEmitter = require('await-event-emitter').default
+
 
 
 /* GET users listing. */
@@ -73,18 +80,22 @@ export class API extends Common {
 
         const bpmnServer = new BPMNServer(configuration, logger, { cron: false, noWait: false });
         const listener = new AwaitEventEmitter()
+        // const listener = new EventEmitter();
         listener.on('all', async ({ context, event }) => {
             try {
-                // console.log(174, context.item?.element.name);
-
                 if (context.item) {
 
                     // console.log(176, context.item._status, "||", context.item.element.name, context.item.element?.name === "End", context.item.element.id);
                     if (context.item.element.name?.includes("start_flow")) {
+
                         if (context.item._status === 'start') {
+
                             const nanoid = customAlphabet('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 2)
                             context.execution.instance.task_id = `EF-${dayjs().format('YYMMDDmmss')}-${nanoid()}`
+
+                            // console.log('context.execution.instance.data', context.execution.instance.data.createdAt, dayjs().format('YYYYMMDD'))
                             if (context.execution.instance.data.createdAt !== dayjs().format('YYYYMMDD') && context.execution.instance.data.refID === undefined) {
+                                console.log('Issue Date invalid', context.execution.instance.data.createdAt, dayjs().toDate(), dayjs().format('YYYYMMDD HH:mm'))
                                 throw new Error("Issue Date invalid")
                             } else {
                                 context.execution.instance.createdAt = context.execution.instance.data.createdAt
@@ -112,8 +123,17 @@ export class API extends Common {
                             }
 
                             //TODO: check in payload from resend
-
                             const requester = context.execution.instance.data.requester
+                            // if (requester.empid === "AH10002500") {
+                            //     try {
+
+                            //         console.log('date : here', dayjs().toDate(), dayjs().format("DD/MM/YYYY HH:mm"))
+                            //         console.log('date : js', new Date())
+                            //     } catch (error) {
+
+                            //     }
+                            //     throw new Error("Issue Date invalid")
+                            // }
                             const submitActionLog = {
 
                                 name: requester.name,
@@ -136,25 +156,18 @@ export class API extends Common {
                             const refID = context.execution.instance.data.refID
                             if (refID) {
                                 submitActionLog.remark = `from Task_ID : ${refID}`
-
-                                context.execution.instance.issueDate = dayjs(context.execution.instance.data.issueDate).toDate()
-                                context.execution.instance.createdAt = dayjs(context.execution.instance.data.issueDate).format('YYYYMMDD')
-                                context.execution.instance.startedAt = dayjs(context.execution.instance.data.issueDate).toDate()
+                                const getTask = await CustomFn.getTaskByTaskId({ task_id: refID })
+                                context.execution.instance.issueDate = dayjs(getTask.issueDate).toDate()
+                                context.execution.instance.createdAt = dayjs(getTask.issueDate).format('YYYYMMDD')
+                                context.execution.instance.startedAt = dayjs(getTask.issueDate).toDate()
                                 context.execution.instance.data.newTaskID = context.execution.instance.task_id
                                 delete context.execution.instance.data.issueDate
-                                await CustomFn.setDuplicate(context.execution.instance.data.refID)
+                                await EleaveFn.setDuplicate(context.execution.instance.data.refID)
                             } else {
                                 context.execution.instance.issueDate = dayjs().toDate()
                             }
                             context.execution.instance.data.actionLog = [submitActionLog]
-
-
-
-
-
-
                         }
-
                     }
                     if (context.item.element.name?.includes("check_resend")) {
                         if (context.item._status === 'start') {
@@ -174,7 +187,8 @@ export class API extends Common {
                                 empid, company, department, section
                             } = context.execution.instance.data.requester
                             const res = await CustomNode.checkBoolLevel({ empid, condition, level, company, department })
-                            context.item.token.execution.output = { checkStatus: res.data.status ?? false }
+                            let checkStatus = res.data.status === undefined ? _.isEmpty(res.data.status) : res.data.status
+                            context.item.token.execution.output = { checkStatus: checkStatus }
 
                             // console.log(context.item);
 
@@ -253,10 +267,6 @@ export class API extends Common {
                                     } else {
                                         throw new Error("No employee id")
                                     }
-                                    // const hierachies = await CustomApi.getMyHierachies(context.execution.instance.data.requester.empid)
-                                    // // console.log(86, hierachies)
-                                    // context.execution.instance.data.requester.name = hierachies.employee.prefix ? hierachies.employee.prefix + "." : "" + hierachies.employee.firstName + " " + hierachies.employee.lastName
-                                    // context.execution.instance.data.requester.level = hierachies.level.level
                                 }
                             }
 
@@ -311,7 +321,6 @@ export class API extends Common {
                             const splitArr = context.item.element.name.split(":")
                             const [name, levelFlow] = splitArr
 
-
                             let {
                                 empid, company, department, section, sub_section
                             } = context.execution.instance.data.requester
@@ -335,7 +344,6 @@ export class API extends Common {
                                 if (!level) {
                                     level = "M2"
                                 }
-                                console.table({ fn: "findHead", company, department, section, level })
                                 res = await CustomNode.findHead({ company, department, section, level })
                                 console.log('res FindHead', res.data)
                                 if (res.data.status === false) {
@@ -345,8 +353,6 @@ export class API extends Common {
                                 if (splitArr.length > 2) {
                                     [company, department, section] = splitArr.slice(2)
                                 }
-                                console.log('in send email approve')
-                                console.table({ company, department, section, level: levelFlow })
 
                                 res = await CustomNode.getEmpPosition({ company, department, section, sub_section, level: levelFlow })
                             }
@@ -411,13 +417,13 @@ export class API extends Common {
                             //onEmail Action
                             const additionApprover = context.execution.execution.input.additionApprover
                             const { email } = additionApprover
-
                             let findApprover = undefined
                             if (email) {
                                 if (_.isArray(context.execution.instance.data.currentApprover)) {
+                                    console.log('404', context.execution.instance.data.currentApprover)
                                     findApprover = context.execution.instance.data.currentApprover.find(d => d.email === email)
                                     if (!findApprover) {
-                                        throw "in valid email"
+                                        throw "invalid email"
                                     }
                                 }
                             }
@@ -442,7 +448,7 @@ export class API extends Common {
                                 delete additionApprover.email
                                 newApprover = { ...newApprover, ...additionApprover }
                             }
-                            if (newApprover["0"] && email) {
+                            if (newApprover["0"]) {
                                 delete newApprover["0"]
                             }
                             logList.push(newApprover)
@@ -458,8 +464,7 @@ export class API extends Common {
                             delete context.execution.instance.data.approved
                             delete context.execution.instance.data.additionApprover
                             console.log('end send_email approve');
-
-
+                            // throw "test JAAAA"
                         }
                     }
 
@@ -472,14 +477,18 @@ export class API extends Common {
                             const userInfo = await CustomFn.getUserInfo(context.execution.instance.data.requester.empid)
                             if (userInfo.data.status) {
                                 let { company, emp_type } = userInfo.data.employee
+                                if (company === "AF" || company === "APC") {
+                                    if (emp_type === "Contract") {
+                                        emp_type = "Sub-Contract"
+                                    }
+                                }
                                 // if (emp_type === "Daily" || emp_type === "Monthly") {
                                 // } else {
                                 //     company = "Sub_Contract"
                                 // }
                                 // emp_type = "Monthly" //TODO: For Test
                                 // company = "AERP" //TODO: For Test
-                                console.table({ company, emp_type })
-                                const getHrLeave = await CustomFn.getHRLeave(company, emp_type)
+                                const getHrLeave = await EleaveFn.getHRLeave(company, emp_type)
                                 if (!getHrLeave) {
                                     throw new Error("No Hr leave Conditions");
                                 }
@@ -498,10 +507,10 @@ export class API extends Common {
 
 
                                         const hrLdap = await CustomFn.getLDAPDataByEmpID(hrEmpID)
-                                        console.log('hrLdap', hrLdap.data)
+                                        // console.log('hrLdap', hrLdap.data)
                                         const hrOrg = await CustomFn.getEmpByEmpID(hrEmpID)
                                         if (hrLdap.data.employee === undefined || hrOrg.data.employee === undefined) {
-                                            throw new Error(`No setting  type : ${emp_type} with company : ${company} `);
+                                            throw (`No setting  type : ${emp_type} with company : ${company} `);
                                         }
                                         approverData.push({
                                             name: hrOrg.data.employee.prefix + "." + hrOrg.data.employee.firstName + " " + hrOrg.data.employee.lastName,
@@ -527,11 +536,9 @@ export class API extends Common {
 
                                     const hrLdap = await CustomFn.getLDAPDataByEmpID(hrEmpID)
 
-                                    console.table({ api: "Hr Ldap", ...hrLdap.data.employee })
                                     const hrOrg = await CustomFn.getEmpByEmpID(hrEmpID)
-                                    console.table({ api: "Hr org", ...hrOrg.data.employee })
                                     if (hrLdap.data.employee === undefined || hrOrg.data.employee === undefined) {
-                                        throw new Error(`No setting  type : ${emp_type} with company : ${company} `);
+                                        throw (`No setting  type : ${emp_type} with company : ${company} `);
                                     }
                                     approverData.push({
                                         name: hrOrg.data.employee.prefix + "." + hrOrg.data.employee.firstName + " " + hrOrg.data.employee.lastName,
@@ -554,7 +561,6 @@ export class API extends Common {
                                 context.execution.instance.data.currentApprover = approverData
                                 context.execution.instance.data.status = "Waiting"
                             }
-                            // throw new Error("test Hr");
 
 
 
@@ -563,29 +569,30 @@ export class API extends Common {
 
                         if (context.item._status === 'end') {
                             //onEmail Action
-                            console.log('context.execution.execution.input', context.execution.execution.input)
                             const isApprove = context.execution.execution.input.additionApprover.approved
                             let appList = context.execution.instance.data.approverList
                                 || []
                             let logList = context.execution.instance.data.actionLog
                                 || []
+                           
+                            const setNewApprover = context.execution.instance.data.newCurrentApprover ?? context.execution.instance.data.currentApprover ? context.execution.instance.data.currentApprover[0] : null
                             let newApprover = {
-                                ...context.execution.instance.data.currentApprover, ...context.execution.instance.data.newCurrentApprover,
+                                ...setNewApprover,
                                 date: dayjs().toISOString(),
                                 action: isApprove ? "Approved" : "Rejected"
                             }
                             if (context.execution.instance.data.additionApprover !== undefined) {
                                 context.item.token.execution.output = { checkStatus: isApprove }
-
+                                if (context.execution.instance.data.additionApprover.email === undefined) {
+                                    delete context.execution.instance.data.additionApprover.email
+                                }
                                 newApprover = { ...newApprover, ...context.execution.instance.data.additionApprover }
                             }
-
                             logList.push(newApprover)
                             appList.push(newApprover)
 
                             context.execution.instance.data.actionLog = logList
-                            context.execution.instance.data.approverList
-                                = appList
+                            context.execution.instance.data.approverList = appList
 
                             context.execution.instance.data.currentApprover = null
                             context.execution.instance.data.status = isApprove ? "Waiting" : "Rejected"
@@ -595,6 +602,44 @@ export class API extends Common {
                             // console.log( context.item);
 
 
+                        }
+                    }
+
+                    if (context.item.element?.name?.includes("notify_user")) {
+                        if (context.item._status === 'end') {
+                            try {
+                                if (context.execution.instance.data.status !== "Cancel") {
+
+
+                                    // console.log('context.item.token.execution.output', context.item.token.execution.output)
+                                    // console.log('context.execution.instance.data', context.execution.instance.data)
+                                    const { checkStatus } = context.item.token.execution.output
+                                    const { approverList, flowName, requester } = context.execution.instance.data
+                                    const lastApprover = _.last(approverList)
+
+                                    let doc_type = flowName
+                                    if (flowName === "leave_flow") {
+                                        doc_type = "E-leave"
+                                    }
+                                    // console.log('lastApprover', lastApprover)
+                                    const createNotifyEss = await axios({
+                                        url: `${process.env.ESS_URL}/requestinstances`,
+                                        method: "POST",
+                                        data: {
+                                            details: {
+                                                status: checkStatus ? "Completed" : "Rejected",
+                                                task_id: context.execution.instance.task_id
+                                            },
+                                            action_by: `${lastApprover.name}`,
+                                            isUnRead: true,
+                                            doc_type,
+                                            emp_id: requester.empid
+                                        }
+                                    })
+                                }
+                            } catch (error) {
+                                console.log('Error Send notify')
+                            }
                         }
                     }
                     if (context.item.element?.name?.includes("end_flow")) {
@@ -694,7 +739,7 @@ export class API extends Common {
                 if (!name)
                     name = request.body.name;
                 let data = request.body.data;
-
+                console.log('name', name)
                 let userId;
 
                 let startNodeId, options = {}, userKey;
@@ -709,7 +754,6 @@ export class API extends Common {
                     userId = request.body.userId;
                 }
                 // customFn()
-                userKey = this.bpmnServer.iam.getRemoteUser(userId);
 
                 let context;
                 try {
@@ -799,104 +843,128 @@ export class API extends Common {
             let errors;
 
             // return ;
-            try {
 
-                let query, data;
-                query =
-                {
-                    "items.id": task_id
-                }
-                data = {
+            let query, data;
 
-                    ...receiveData,
+            data = {
 
-                }
-                if (field) {
-                    if (haveFile) {
-                        const formData = new FormData();
+                ...receiveData,
 
-                        files.forEach(element => {
+            }
+            if (field) {
+                if (haveFile) {
+                    const formData = new FormData();
 
-                            formData.append("files", element.buffer, element.originalname);
-                        });
-                        const headers = {
-                            headers: {
-                                // Authorization: "Bearer " + localStorage.getItem("QCAPPjwt"),
-                                "Content-Type": "multipart/form-data",
-                            },
-                        };
-                        const res = await axios.post(`${process.env.Strapi_URL}/api/upload`, formData, headers);
-                        if (res.status === 200) {
-                            if (Array.isArray(res.data)) {
-                                res.data.forEach(element => {
-                                    filesURL.push(element.url)
-                                });
-                            }
+                    files.forEach(element => {
+
+                        formData.append("files", element.buffer, element.originalname);
+                    });
+                    const headers = {
+                        headers: {
+                            // Authorization: "Bearer " + localStorage.getItem("QCAPPjwt"),
+                            "Content-Type": "multipart/form-data",
+                        },
+                    };
+                    const res = await axios.post(`${process.env.Strapi_URL}/api/upload`, formData, headers);
+                    if (res.status === 200) {
+                        if (Array.isArray(res.data)) {
+                            res.data.forEach(element => {
+                                filesURL.push(element.url)
+                            });
                         }
+                    }
 
 
-                    }
-                    // data[field] = fieldData
-                    data.additionApprover = {
-                        email: email,
-                        filesURL: filesURL.length > 0 ? filesURL : null,
-                        remark: remark,
-                    }
-                    data.additionApprover[field] = fieldData
-                } else {
-                    data.additionApprover[field] = fieldData
                 }
-                console.log('user', user)
-                //TODO: add condition to Data console.log('',)
-                if (user != null) {
-                    data.newCurrentApprover = {
-                        name: user.fullName,
-                        email: user.email,
-                        empid: user.username,
-                        position: user.position,
-                    }
-                    // if (user.level) {
-                    //     data.newCurrentApprover.level = user.level
-                    // }
-                    if (user.section) {
-                        data.newCurrentApprover.section = user.section
-                    }
-                    if (user.sub_section) {
-                        data.newCurrentApprover.sub_section = user.sub_section ?? null
-                    }
-                    if (user.company) {
-                        data.newCurrentApprover.company = user.company
-                    }
-                    if (user.department) {
-                        data.newCurrentApprover.department = user.department
-                    }
-
-                    // await CustomApi.getMyHierachies(user.username)
+                // data[field] = fieldData
+                data.additionApprover = {
+                    email: email,
+                    filesURL: filesURL.length > 0 ? filesURL : null,
+                    remark: remark,
+                }
+                data.additionApprover[field] = fieldData
+            } else {
+                data.additionApprover[field] = fieldData
+            }
+            //TODO: add condition to Data console.log('',)
+            if (user != null) {
+                data.newCurrentApprover = {
+                    name: user.fullName,
+                    email: user.email,
+                    empid: user.username,
+                    position: user.position,
+                }
+                // if (user.level) {
+                //     data.newCurrentApprover.level = user.level
+                // }
+                if (user.section) {
+                    data.newCurrentApprover.section = user.section
+                }
+                if (user.sub_section) {
+                    data.newCurrentApprover.sub_section = user.sub_section ?? null
+                }
+                if (user.company) {
+                    data.newCurrentApprover.company = user.company
+                }
+                if (user.department) {
+                    data.newCurrentApprover.department = user.department
                 }
 
-                // let Datacontext = await this.bpmnServer.engine.get(query);
-                // console.log('data813', data)
-                setTimeout(async () => {
-                    if (context && context.errors) {
+                // await CustomApi.getMyHierachies(user.username)
+            }
 
-                        errors = context.errors.toString();
-                    }
-                    // response.setHeader('Content-Type', 'text/html');
+            // let Datacontext = await this.bpmnServer.engine.get(query);
+            // console.log('data813', data)
 
-                    if (context && context.execution) {
-                        await CustomFn.clearLogsTask(context.execution?.instance?.task_id)
-                    }
-                }, 500)
-                // throw "error"
+            // throw "error"
+            const getTask = await CustomFn.getTaskByItemID(task_id)
+            if (!getTask) {
+                throw "Cannot Find Task"
+            }
+            query = {
+                "items.id": task_id
+            }
+
+            let new_id = _.last(getTask.items).elementId
+            if (_.last(getTask.items).status === 'end') {
+                const newItem = deleteLastEnd(getTask.items)
+                const test = await CustomFn.setNewItem(getTask.task_id, newItem)
+
+                new_id = _.last(newItem).elementId
+                query = {
+                    "items.id": _.last(newItem).id
+                }
+            }
+            try {
+                console.log('', { task_id: getTask.task_id, "items.elementId": new_id }
+                )
+                // context = await bpmnServer.engine.invoke(
+                //     { task_id: getTask.task_id, "items.elementId": new_id }
+                //     , data);
                 context = await bpmnServer.engine.invoke(query, data);
+
+
+                if (context && context.errors) {
+                }
+
+                if (context && context.errors) {
+
+                    errors = context.errors.toString();
+                }
+                // response.setHeader('Content-Type', 'text/html');
+
+                if (context && context.execution) {
+                    await CustomFn.clearLogsTask(context.execution?.instance?.task_id)
+                }
                 // instance = context.instance;
 
 
                 response.status(200).json({ success: 'success' })
             }
             catch (exc) {
+
                 errors = exc.toString();
-                console.log(errors);
+                console.log(925, errors);
                 response.status(400).json({ errors: errors });
             }
         }));
@@ -1264,3 +1332,14 @@ async function display(res, title, output, logs = [], items = []) {
 }
 
 export default router;
+
+
+
+const deleteLastEnd = (itemArr) => {
+    if (_.last(itemArr).status === 'end') {
+        itemArr.pop()
+        deleteLastEnd(itemArr);
+    }
+    return itemArr
+
+}

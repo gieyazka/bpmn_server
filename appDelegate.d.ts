@@ -1,4 +1,4 @@
-import { Item, IExecution } from './';
+import { IExecution, Item } from './';
 import { DefaultAppDelegate } from './index';
 declare class MyAppDelegate extends DefaultAppDelegate {
     constructor(server: any);

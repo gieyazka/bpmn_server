@@ -10,21 +10,11 @@ import { configuration as config, configuration } from '../configuration';
 import { xml2js, xml2json } from "xml-js"
 
 import { Common } from './common';
-import CustomApi from '../custom_function/index'
 import CustomNode from '../custom_node/index'
-import axios from 'axios'
+import ELeaveFn from '../Eleave_function/index'
+import customFn from '../custom_function/index'
 
-var DOMParser = require('xmldom').DOMParser;
-
-const AwaitEventEmitter = require('await-event-emitter').default
-//const bpmnServer = new BPMNServer(config);
-
-//const definitions = bpmnServer.definitions;
-
-
-/* GET users listing. */
-
-console.log("Custom api.ts");
+console.log("Leave api.ts");
 
 const awaitAppDelegateFactory = (middleware) => {
     return async (req, res, next) => {
@@ -64,7 +54,7 @@ export class API extends Common {
         // var bpmnServer = this.bpmnServer;
 
         router.get("/getHRLeaveSetting", async (req, res) => {
-            const mongoData = await CustomApi.getHRLeaveSetting();
+            const mongoData = await ELeaveFn.getHRLeaveSetting();
 
             res.json(mongoData);
         })
@@ -97,7 +87,7 @@ export class API extends Common {
 
 
                 // console.log(context);
-                const mongoData = await CustomApi.getCurrentApprove();
+                const mongoData = await customFn.getCurrentApprove();
 
                 response.json(mongoData);
             }
@@ -110,8 +100,11 @@ export class API extends Common {
             // console.log(200, mongoose.connection.readyState);
             try {
                 let data = request.body;
-                console.log('data', data)
-                const leaveQuota = await CustomApi.getLeaveQuota(data);
+                // console.log('data', data)
+                if (data.data) {
+                    data = data.data
+                }
+                const leaveQuota = await ELeaveFn.getLeaveQuota(data);
                 response.json(leaveQuota);
             }
             catch (exc) {
@@ -122,26 +115,14 @@ export class API extends Common {
             // console.log(200, mongoose.connection.readyState);
             try {
                 let data = request.body;
-                console.log('data', data)
-                const leaveQuota = await CustomApi.calLeaveQuota(data);
+                const leaveQuota = await ELeaveFn.calLeaveQuota(data);
                 response.json(leaveQuota);
             }
             catch (exc) {
                 response.json({ error: exc.toString() });
             }
         }));
-        router.get('/getLeaveQuota', awaitAppDelegateFactory(async (request, response) => {
-            // console.log(200, mongoose.connection.readyState);
-            try {
-                let data = request.body;
-                console.log('data', data)
-                const leaveQuota = await axios.get('https://ess.aapico.com/annualleaves?emp_id=10002564&company=AH')
-                response.json(leaveQuota);
-            }
-            catch (exc) {
-                response.json({ error: exc.toString() });
-            }
-        }));
+
         router.post('/getLeaveDay', loggedIn, awaitAppDelegateFactory(async (request, response) => {
             // console.log(200, mongoose.connection.readyState);
             try {
@@ -149,7 +130,7 @@ export class API extends Common {
                 if (request.body.data === undefined) {
                     data = request.body
                 }
-                const leaveDay = await CustomApi.getLeaveDay(data);
+                const leaveDay = await ELeaveFn.getLeaveDay(data);
                 response.json(leaveDay);
             }
             catch (exc) {
@@ -158,26 +139,16 @@ export class API extends Common {
         }));
 
 
-        router.get('/testGetLeave/:date', awaitAppDelegateFactory(async (request, response) => {
-            try {
-
-                let data = request.params;
-                const { date } = data
-
-
-                const mongoData = await CustomApi.getLeave({ date });
-                console.log(mongoData.length);
-                response.json(mongoData);
-
-            }
-            catch (exc) {
-                response.json({ error: exc.toString() });
-            }
-        }));
 
 
 
 
+
+        router.post('/getLeaveCalendar', awaitAppDelegateFactory(async (request, response) => {
+            let data = request.body;
+            const mongoData = await ELeaveFn.getLeaveCalendar(data);
+            response.json(mongoData);
+        }))
 
         router.post('/find_my_task', awaitAppDelegateFactory(async (request, response) => {
             // console.log(200, mongoose.connection.readyState);
@@ -206,10 +177,9 @@ export class API extends Common {
 
 
 
-                // console.log(context);
-                const mongoData = await CustomApi.getmyTask(data);
-                // console.log(234,mongoData);
-                console.log(mongoData.length);
+
+                const mongoData = await customFn.getmyTask(data);
+
                 response.json(mongoData);
             }
             catch (exc) {
@@ -223,7 +193,7 @@ export class API extends Common {
                 if (!name)
                     name = request.body.name;
                 let data = request.body;
-                const mongoData = await CustomApi.addCompanyHrLeaveSetting(data);
+                const mongoData = await ELeaveFn.addCompanyHrLeaveSetting(data);
                 response.json(mongoData);
             }
             catch (exc) {
@@ -236,7 +206,7 @@ export class API extends Common {
                 if (!name)
                     name = request.body.name;
                 let data = request.body;
-                const mongoData = await CustomApi.updateSettingHrLeave(data);
+                const mongoData = await ELeaveFn.updateSettingHrLeave(data);
                 response.json(mongoData);
             }
             catch (exc) {
@@ -251,7 +221,7 @@ export class API extends Common {
                     name = request.body.name;
                 let data = request.body;
                 // console.log(data);
-                const mongoData = await CustomApi.hrCancel(data);
+                const mongoData = await ELeaveFn.hrCancel(data);
                 response.json(mongoData);
             }
             catch (exc) {
@@ -264,7 +234,7 @@ export class API extends Common {
         router.post('/updateLeaveFile', awaitAppDelegateFactory(async (request, response) => {
             try {
                 let data = request.body;
-                const mongoData = await CustomApi.updateLeaveFile(data);
+                const mongoData = await ELeaveFn.updateLeaveFile(data);
 
                 response.json(mongoData);
                 // response.json("test");
@@ -275,12 +245,15 @@ export class API extends Common {
         }));
 
         router.post('/getManager', awaitAppDelegateFactory(async (request, response) => {
+
             try {
                 let data = request.body;
                 const { empid, level = "E1", company, department, section, sub_section } = data
                 let condition = "gte"
                 const checkRule = await CustomNode.checkBoolLevel({ empid, condition, level, company, department })
-                if (checkRule.data.status === true) {
+                let checkStatus = checkRule.data.status === undefined ? _.isEmpty(checkRule.data.status) : checkRule.data.status
+                //Note: Ky check isEmpty cuz API Broken not return
+                if (checkRule.data.status === true || checkStatus) {
                     //findHead
                     const getHead = await CustomNode.getHead({ empid, company, department })
                     response.json(getHead.data);
@@ -299,6 +272,7 @@ export class API extends Common {
                 // response.json("test");
             }
             catch (exc) {
+                console.log('', 290)
                 response.status(404).json({ error: exc.toString() });
             }
         }));
@@ -314,7 +288,7 @@ export class API extends Common {
 
 
 
-                const mongoData = await CustomApi.hrSetLeave(data);
+                const mongoData = await ELeaveFn.hrSetLeave(data);
 
                 response.json(mongoData);
                 // response.json("test");
@@ -350,7 +324,21 @@ export class API extends Common {
 
 
                 // console.log(context);
-                const mongoData = await CustomApi.getTaskByItemID(data);
+                const mongoData = await customFn.getTaskByItemID(data);
+                response.json(mongoData);
+            }
+            catch (exc) {
+                response.json({ error: exc.toString() });
+            }
+        }));
+        router.post('/getTaskByTaskId', awaitAppDelegateFactory(async (request, response) => {
+            // console.log(200, mongoose.connection.readyState);
+            try {
+
+                let data = request.body.data;
+                // console.log(context);
+                const mongoData = await customFn.getTaskByTaskId(data);
+
                 response.json(mongoData);
             }
             catch (exc) {
@@ -383,8 +371,7 @@ export class API extends Common {
 
 
 
-
-                const mongoData = await CustomApi.getCurrentApproveTask(data);
+                const mongoData = await customFn.getCurrentApproveTask(data);
                 response.json(mongoData);
             }
             catch (exc) {
@@ -418,7 +405,7 @@ export class API extends Common {
 
 
 
-                const mongoData = await CustomApi.getAction_logs(data);
+                const mongoData = await customFn.getAction_logs(data);
                 response.json(mongoData);
             }
             catch (exc) {

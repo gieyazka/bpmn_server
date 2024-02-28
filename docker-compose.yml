@@ -13,7 +13,7 @@ services:
       - db
     environment:
       - MONGO_DB_URL=mongodb://db:27017/bpmn
-
+      - TZ=Asia/Bangkok
     networks:
       - my-network
     restart: always

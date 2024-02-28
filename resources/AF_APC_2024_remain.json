@@ -1,0 +1,2237 @@
+[
+    {
+      "empId": 10000031,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 10001437,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001362,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10001438,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000057,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000807,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000851,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 64000017,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 64000019,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 64000020,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 64000021,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 64000022,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 64000023,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 64000024,
+      "quota": 2,
+      "company": "APC"
+    },
+    {
+      "empId": 64000025,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 64000026,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000041,
+      "quota": 2.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000052,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000058,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10000061,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000076,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000085,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000100,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10000120,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 10000124,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000130,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000183,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000194,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 10000213,
+      "quota": 7,
+      "company": "APC"
+    },
+    {
+      "empId": 10000230,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000255,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000262,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000271,
+      "quota": 6.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000274,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10000284,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000339,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000353,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000356,
+      "quota": 5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000385,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 10000440,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000488,
+      "quota": 4,
+      "company": "APC"
+    },
+    {
+      "empId": 10000514,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000622,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000826,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000831,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 10000833,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000896,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000897,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000898,
+      "quota": 4,
+      "company": "APC"
+    },
+    {
+      "empId": 10000963,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000979,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000999,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 10001022,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 10001030,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001037,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001040,
+      "quota": 2,
+      "company": "APC"
+    },
+    {
+      "empId": 10001059,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 10001076,
+      "quota": 5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001085,
+      "quota": 4,
+      "company": "APC"
+    },
+    {
+      "empId": 10001104,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001106,
+      "quota": 5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001109,
+      "quota": 1.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001111,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001133,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001140,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001142,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001145,
+      "quota": 4,
+      "company": "APC"
+    },
+    {
+      "empId": 10001148,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001153,
+      "quota": 5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001183,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001184,
+      "quota": 6,
+      "company": "APC"
+    },
+    {
+      "empId": 10001186,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001216,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001217,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001219,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10001221,
+      "quota": 6,
+      "company": "APC"
+    },
+    {
+      "empId": 10001223,
+      "quota": 4.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001226,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10001227,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001235,
+      "quota": 2,
+      "company": "APC"
+    },
+    {
+      "empId": 10001245,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10001282,
+      "quota": 2,
+      "company": "APC"
+    },
+    {
+      "empId": 10001283,
+      "quota": 6,
+      "company": "APC"
+    },
+    {
+      "empId": 10001284,
+      "quota": 6,
+      "company": "APC"
+    },
+    {
+      "empId": 10001286,
+      "quota": 7,
+      "company": "APC"
+    },
+    {
+      "empId": 10001287,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001288,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 10001289,
+      "quota": 2,
+      "company": "APC"
+    },
+    {
+      "empId": 10001290,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001292,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001295,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10001328,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001329,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001330,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001331,
+      "quota": 2,
+      "company": "APC"
+    },
+    {
+      "empId": 10001332,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001334,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10001335,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001338,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10001339,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 10001340,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001341,
+      "quota": 1.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001343,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001344,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001345,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001346,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001347,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001348,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10001349,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001350,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001404,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001405,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001406,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001411,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001422,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001445,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001446,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001447,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001448,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001449,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001450,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001451,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001452,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001453,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001454,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001455,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000187,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001319,
+      "quota": 5.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001398,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001423,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001424,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001367,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000265,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000331,
+      "quota": 5.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000492,
+      "quota": 2,
+      "company": "APC"
+    },
+    {
+      "empId": 10001163,
+      "quota": 4,
+      "company": "APC"
+    },
+    {
+      "empId": 10001257,
+      "quota": 5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001265,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001372,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001442,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000184,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10000697,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000843,
+      "quota": 4.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000852,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000928,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 10001136,
+      "quota": 8,
+      "company": "APC"
+    },
+    {
+      "empId": 10001137,
+      "quota": 2.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001138,
+      "quota": 5.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001236,
+      "quota": 7,
+      "company": "APC"
+    },
+    {
+      "empId": 10001239,
+      "quota": 5.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001241,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001394,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000125,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000204,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000601,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10000605,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000666,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001143,
+      "quota": 2.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001428,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001432,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000802,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000886,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000919,
+      "quota": 2.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10001280,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 10001397,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10001415,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000242,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10000453,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000462,
+      "quota": 6.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000512,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000636,
+      "quota": 5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000669,
+      "quota": 2,
+      "company": "APC"
+    },
+    {
+      "empId": 10000756,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000759,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000790,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10000791,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10000836,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000858,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10000902,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 10000942,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001021,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001197,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001200,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10001243,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10001256,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001261,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001262,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10001296,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 10001308,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 10001444,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400011,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400051,
+      "quota": 2,
+      "company": "APC"
+    },
+    {
+      "empId": 60400071,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400086,
+      "quota": 2,
+      "company": "APC"
+    },
+    {
+      "empId": 60400089,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400092,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60400098,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60300006,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60300010,
+      "quota": 5,
+      "company": "APC"
+    },
+    {
+      "empId": 60400125,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400140,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400144,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400149,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 60400150,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60400148,
+      "quota": 4,
+      "company": "APC"
+    },
+    {
+      "empId": 60400153,
+      "quota": 4,
+      "company": "APC"
+    },
+    {
+      "empId": 60400162,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400163,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 60400167,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400186,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400189,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 60400233,
+      "quota": 4,
+      "company": "APC"
+    },
+    {
+      "empId": 60200021,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 60200031,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60200037,
+      "quota": 3.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60200048,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 60300068,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60300083,
+      "quota": 2,
+      "company": "APC"
+    },
+    {
+      "empId": 60200068,
+      "quota": 2.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60200069,
+      "quota": 3.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60400272,
+      "quota": 2.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60400278,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 60200078,
+      "quota": 4,
+      "company": "APC"
+    },
+    {
+      "empId": 60200096,
+      "quota": 5,
+      "company": "APC"
+    },
+    {
+      "empId": 60400289,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60400296,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60200105,
+      "quota": 4.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60200107,
+      "quota": 3.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60400320,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400328,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400337,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60400353,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 60400355,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400361,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400362,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60200123,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60300057,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 60400203,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400268,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 60200042,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 60200070,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 60200072,
+      "quota": 3,
+      "company": "APC"
+    },
+    {
+      "empId": 60200129,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60200188,
+      "quota": 1.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60200187,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60400383,
+      "quota": 1,
+      "company": "APC"
+    },
+    {
+      "empId": 60400386,
+      "quota": 0,
+      "company": "APC"
+    },
+    {
+      "empId": 60400389,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60200197,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60200198,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 60200199,
+      "quota": 0.5,
+      "company": "APC"
+    },
+    {
+      "empId": 10000884,
+      "quota": 3.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001169,
+      "quota": 2.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001378,
+      "quota": 3.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001213,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000135,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000158,
+      "quota": 5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000373,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10001376,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000005,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000002,
+      "quota": 2,
+      "company": "AF"
+    },
+    {
+      "empId": 10000734,
+      "quota": 6,
+      "company": "AF"
+    },
+    {
+      "empId": 10001205,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000010,
+      "quota": 3.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000163,
+      "quota": 4.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000403,
+      "quota": 2.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001379,
+      "quota": 1.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001310,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000027,
+      "quota": 3.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000188,
+      "quota": 5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000434,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10001271,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000748,
+      "quota": 2,
+      "company": "AF"
+    },
+    {
+      "empId": 10000804,
+      "quota": 6.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000165,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000996,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000075,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000916,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001010,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000111,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000200,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000209,
+      "quota": 2,
+      "company": "AF"
+    },
+    {
+      "empId": 10000234,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000844,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000860,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000923,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000924,
+      "quota": 6,
+      "company": "AF"
+    },
+    {
+      "empId": 10000926,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000927,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000965,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10001278,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10001009,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10001231,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000136,
+      "quota": 1.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000973,
+      "quota": 1.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000046,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000164,
+      "quota": 4,
+      "company": "AF"
+    },
+    {
+      "empId": 10001390,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000013,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000035,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000078,
+      "quota": 2,
+      "company": "AF"
+    },
+    {
+      "empId": 10000122,
+      "quota": 3,
+      "company": "AF"
+    },
+    {
+      "empId": 10000176,
+      "quota": 2,
+      "company": "AF"
+    },
+    {
+      "empId": 10000177,
+      "quota": 2,
+      "company": "AF"
+    },
+    {
+      "empId": 10000186,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000366,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000372,
+      "quota": 2,
+      "company": "AF"
+    },
+    {
+      "empId": 10000600,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10001170,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10001179,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001387,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000410,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000521,
+      "quota": 2,
+      "company": "AF"
+    },
+    {
+      "empId": 10000740,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000803,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000822,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000944,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001024,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10001132,
+      "quota": 2.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001260,
+      "quota": 5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001268,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001353,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10001380,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001395,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000011,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000012,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000055,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000072,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000086,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000089,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000115,
+      "quota": 3,
+      "company": "AF"
+    },
+    {
+      "empId": 10000150,
+      "quota": 7,
+      "company": "AF"
+    },
+    {
+      "empId": 10000155,
+      "quota": 5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000247,
+      "quota": 2,
+      "company": "AF"
+    },
+    {
+      "empId": 10000281,
+      "quota": 2,
+      "company": "AF"
+    },
+    {
+      "empId": 10000306,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000315,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000400,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000450,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000572,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000590,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000948,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10001003,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10001272,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000024,
+      "quota": 6.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000083,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 64000002,
+      "quota": 5,
+      "company": "AF"
+    },
+    {
+      "empId": 64000003,
+      "quota": 9,
+      "company": "AF"
+    },
+    {
+      "empId": 64000004,
+      "quota": 8,
+      "company": "AF"
+    },
+    {
+      "empId": 64000005,
+      "quota": 8,
+      "company": "AF"
+    },
+    {
+      "empId": 64000008,
+      "quota": 2,
+      "company": "AF"
+    },
+    {
+      "empId": 64000009,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 64000014,
+      "quota": 2.5,
+      "company": "AF"
+    },
+    {
+      "empId": 64000015,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 64000016,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 64000013,
+      "quota": 3,
+      "company": "AF"
+    },
+    {
+      "empId": 10000044,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000148,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000210,
+      "quota": 3,
+      "company": "AF"
+    },
+    {
+      "empId": 10000260,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000344,
+      "quota": 2.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000480,
+      "quota": 6,
+      "company": "AF"
+    },
+    {
+      "empId": 10000546,
+      "quota": 1.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000654,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000823,
+      "quota": 4,
+      "company": "AF"
+    },
+    {
+      "empId": 10000932,
+      "quota": 2.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000017,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000018,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000022,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000033,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000036,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000038,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000048,
+      "quota": 1.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000060,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000069,
+      "quota": 2.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000074,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000082,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000091,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000094,
+      "quota": 5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000103,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000110,
+      "quota": 3,
+      "company": "AF"
+    },
+    {
+      "empId": 10000116,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000145,
+      "quota": 2,
+      "company": "AF"
+    },
+    {
+      "empId": 10000157,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000205,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000236,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000237,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000286,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000294,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000314,
+      "quota": 8,
+      "company": "AF"
+    },
+    {
+      "empId": 10000316,
+      "quota": 5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000340,
+      "quota": 6,
+      "company": "AF"
+    },
+    {
+      "empId": 10000368,
+      "quota": 11,
+      "company": "AF"
+    },
+    {
+      "empId": 10000398,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000424,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000425,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000459,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000506,
+      "quota": 3,
+      "company": "AF"
+    },
+    {
+      "empId": 10000535,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000646,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000717,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000729,
+      "quota": 5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000774,
+      "quota": 6,
+      "company": "AF"
+    },
+    {
+      "empId": 10000846,
+      "quota": 3,
+      "company": "AF"
+    },
+    {
+      "empId": 10000850,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000900,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000907,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000908,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000929,
+      "quota": 4,
+      "company": "AF"
+    },
+    {
+      "empId": 10000930,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000939,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000961,
+      "quota": 7,
+      "company": "AF"
+    },
+    {
+      "empId": 10000991,
+      "quota": 2.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000992,
+      "quota": 7.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001001,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10001002,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10001203,
+      "quota": 0.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10001214,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10001297,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10001307,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10001357,
+      "quota": 3,
+      "company": "AF"
+    },
+    {
+      "empId": 10001393,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 64000006,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000167,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000175,
+      "quota": 3,
+      "company": "AF"
+    },
+    {
+      "empId": 10000030,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000045,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000049,
+      "quota": 5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000062,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000127,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000160,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000168,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000173,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000298,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000358,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000395,
+      "quota": 1,
+      "company": "AF"
+    },
+    {
+      "empId": 10000417,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000444,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000455,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000510,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000592,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000603,
+      "quota": 1.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000839,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000840,
+      "quota": 0,
+      "company": "AF"
+    },
+    {
+      "empId": 10000842,
+      "quota": 5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000934,
+      "quota": 1.5,
+      "company": "AF"
+    },
+    {
+      "empId": 10000936,
+      "quota": 0.5,
+      "company": "AF"
+    }
+  ]

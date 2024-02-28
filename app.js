@@ -177,13 +177,15 @@ class WebApp {
         var Docs = require("./routes/docs").Docs;
         var Model = require("./routes/model").Model;
         var API = require("./routes/api").API;
-        var Custom_API = require("./routes/custom_api").API;
+        var Leave_API = require("./routes/leave_api").API;
+        var workflow_api = require("./routes/workflow_api").API;
         this.app.use('/', (new Workflow(this)).config());
         //NOPASSPORT 		this.app.use('/', (new Account(this)).config());
         this.app.use('/docs', (new Docs(this)).config());
         this.app.use('/model', (new Model(this)).config());
         this.app.use('/api', (new API(this)).config());
-        this.app.use('/custom_api', (new Custom_API(this)).config());
+        this.app.use('/custom_api', (new Leave_API(this)).config());
+        this.app.use('/workflow_api', (new workflow_api(this)).config());
     }
 }
 exports.WebApp = WebApp;

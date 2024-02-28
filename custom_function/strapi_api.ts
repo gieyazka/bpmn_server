@@ -1,6 +1,7 @@
+
+
+
 var axios = require('axios');
-
-
 const sendStrapi_email = async (props) => {
 
     // const data = {
@@ -11,7 +12,7 @@ const sendStrapi_email = async (props) => {
     //     linkReject,
     //     bcc,
     // };
-    
+
     const config = {
         method: 'post',
         maxBodyLength: Infinity,
@@ -151,4 +152,4 @@ const getEmpByEmpID = async (empid) => {
 };
 
 
-module.exports = { sendStrapi_email, getMyHierachies, getEmployee, getUserInfo, getLDAPData, getLDAPDataByEmpID ,getEmpByEmpID};
+module.exports = { sendStrapi_email, getMyHierachies, getEmployee, getUserInfo, getLDAPData, getLDAPDataByEmpID, getEmpByEmpID };

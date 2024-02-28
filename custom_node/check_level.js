@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var axios = require('axios');
 const checkBoolLevel = ({ condition, empid, level, company, department }) => __awaiter(this, void 0, void 0, function* () {
-    console.table({ condition, empid, level, company, department });
     const checkMyLevel = yield axios.post(`${process.env.Strapi_URL}/api/hierachies/checkConditionLevel`, {
         condition, empid, control_level: level, company, department
     });

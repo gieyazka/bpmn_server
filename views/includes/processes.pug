@@ -5,7 +5,6 @@ h3 Processes (BPMN Definitions)
 		var selectedProcess,userId;
 
 		$(window).on('pageshow', function(){
-
 			if (!$("#process").val())
 			{
 				$("#process").val($("#process option:first").val());
@@ -13,6 +12,7 @@ h3 Processes (BPMN Definitions)
 
 			
 			selectedProcess = $("#process").val();
+			console.log('selectedProcess',JSON.stringify(selectedProcess))
 			$("#svg").attr("src", "/model/getSVg/"+selectedProcess);
 			setLinks();
 
@@ -67,6 +67,8 @@ div(id="processes")
 									each proc in procs
 										option #{proc}
 										a value #{proc}
+										//- option #{proc.name}
+										//- a value #{proc.name}
 
 						tr
 							td

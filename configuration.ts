@@ -1,7 +1,7 @@
+import { ACL, IAM } from './';
+import { Configuration, DataStore, Logger, ModelsDatastore } from './';
 
-import { Configuration, ModelsDatastore, DataStore , Logger } from './';
 import { MyAppDelegate } from './appDelegate';
-import { IAM, ACL } from './';
 
 const dotenv = require('dotenv');
 const res = dotenv.config();

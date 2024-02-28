@@ -3,7 +3,6 @@ var axios = require('axios')
 const checkBoolLevel = async ({ condition, empid, level, company, department }: {
     condition: string, empid: string, level: string, company: string, department: string, section: string
 }) => {
-    console.table({ condition, empid, level, company, department })
     const checkMyLevel = await axios.post(`${process.env.Strapi_URL}/api/hierachies/checkConditionLevel`, {
         condition, empid, control_level: level, company, department
     })

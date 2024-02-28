@@ -269,7 +269,7 @@ function displayError(res, error) {
 }
 function display(req, res, title, output, logs = [], items = []) {
     return __awaiter(this, void 0, void 0, function* () {
-        var instances = yield bpmnServer.dataStore.findInstances({}, 'summary');
+        // var instances = await bpmnServer.dataStore.findInstances({},'summary');
         let waiting = yield bpmnServer.dataStore.findItems({ "items.status": 'wait' });
         waiting.forEach(item => {
             item.fromNow = (0, __1.dateDiff)(item.startedAt);
@@ -279,13 +279,13 @@ function display(req, res, title, output, logs = [], items = []) {
             engine.fromNow = (0, __1.dateDiff)(engine.startedAt);
             engine.fromLast = (0, __1.dateDiff)(engine.lastAt);
         });
-        instances.forEach(item => {
-            item.fromNow = (0, __1.dateDiff)(item.startedAt);
-            if (item.endedAt)
-                item.endFromNow = (0, __1.dateDiff)(item.endedAt);
-            else
-                item.endFromNow = '';
-        });
+        // instances.forEach(item => {
+        //     item.fromNow = dateDiff(item.startedAt);
+        //     if (item.endedAt)
+        //         item.endFromNow = dateDiff(item.endedAt);
+        //     else
+        //         item.endFromNow = '';
+        // });
         res.render('index', {
             title: title, output: output,
             engines,
@@ -293,7 +293,7 @@ function display(req, res, title, output, logs = [], items = []) {
             procs: yield bpmnServer.definitions.getList(),
             debugMsgs: [],
             waiting: waiting,
-            instances,
+            // instances,
             request: req,
             logs, items
         });
